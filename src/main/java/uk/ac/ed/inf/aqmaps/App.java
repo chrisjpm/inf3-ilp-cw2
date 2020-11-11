@@ -17,8 +17,8 @@ public class App {
 
 		// Parse all required files
 		var parser = new ParseJsonFiles(httpConn);
-		//parser.readBuildings();
-		//parser.getBuildings();
+		parser.readBuildings();
+		parser.getBuildings();
 		parser.readMaps("2020", "01", "01");
 		parser.readWords("acid", "chair", "butter");
 	}
