@@ -2,10 +2,12 @@ package uk.ac.ed.inf.aqmaps;
 
 public class Details {
 	String country;
-	
+
 	Sqaure square;
+
 	public class Sqaure {
 		Southwest southwest;
+
 		public class Southwest {
 			double lng;
 			double lat;
@@ -15,8 +17,9 @@ public class Details {
 				return "Southwest [lng=" + lng + ", lat=" + lat + "]";
 			}
 		}
-		
+
 		NorthWest northwest;
+
 		public class NorthWest {
 			double lng;
 			double lat;
@@ -29,13 +32,15 @@ public class Details {
 
 		@Override
 		public String toString() {
-			return "Sqaure [southwest=" + southwest + ", northwest=" + northwest + "]";
+			return "Sqaure [southwest=" + southwest + ", northwest=" + northwest
+					+ "]";
 		}
 	}
 
 	String nearestPlace;
-	
+
 	Coordinates coordinates;
+
 	public class Coordinates {
 		double lng;
 		double lat;
@@ -52,7 +57,9 @@ public class Details {
 
 	@Override
 	public String toString() {
-		return "Details [country=" + country + ", square=" + square + ", nearestPlace=" + nearestPlace
-				+ ", coordinates=" + coordinates + ", words=" + words + ", language=" + language + ", map=" + map + "]";
+		return "Details [country=" + country + ", square=" + square
+				+ ", nearestPlace=" + nearestPlace + ", coordinates="
+				+ coordinates + ", words=" + words + ", language=" + language
+				+ ", map=" + map + "]";
 	}
 }
