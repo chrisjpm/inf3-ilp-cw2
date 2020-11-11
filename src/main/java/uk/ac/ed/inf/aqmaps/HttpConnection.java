@@ -64,6 +64,7 @@ public class HttpConnection {
 		} catch (IOException | InterruptedException e) {
 			System.out.println("Fatal error: Unable to connect to " + this.ip
 					+ " at port " + this.port + ".");
+			e.printStackTrace();
 			System.exit(1); // Exit the application
 		}
 	}

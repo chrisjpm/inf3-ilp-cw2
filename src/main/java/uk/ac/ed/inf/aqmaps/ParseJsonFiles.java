@@ -35,6 +35,8 @@ public class ParseJsonFiles {
 	public double getWordsLat() {
 		return this.wordsLat;
 	}
+	
+	// Setters
 
 	// Methods
 	// Parse buildings, i.e. the no-fly-zones
