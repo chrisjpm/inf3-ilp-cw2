@@ -29,7 +29,7 @@ public class App {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// Write the readings to a GeoJson file
 	static void writeReadings(String readings, String yyy, String mm,
 			String dd) {
@@ -37,10 +37,9 @@ public class App {
 				"readings-" + dd + "-" + mm + "-" + yyy + ".geojson")) {
 			myWriter.write(readings);
 			myWriter.close();
-			System.out.println("Flight path GeoJson successfully created!");
+			System.out.println("Readings GeoJson successfully created!");
 		} catch (IOException e) {
-			System.out.println(
-					"Fatal error: Flight path GeoJson wasn't created!");
+			System.out.println("Fatal error: Readings GeoJson wasn't created!");
 			e.printStackTrace();
 		}
 	}

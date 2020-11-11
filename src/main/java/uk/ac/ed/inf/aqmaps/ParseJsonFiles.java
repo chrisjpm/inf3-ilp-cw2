@@ -27,33 +27,32 @@ public class ParseJsonFiles {
 	public ArrayList<String> getSensorWords() {
 		return this.sensorPositions;
 	}
-	
+
 	public double getWordsLng() {
 		return this.wordsLng;
 	}
-	
+
 	public double getWordsLat() {
 		return this.wordsLat;
 	}
-	
-	// Setters
 
 	// Methods
 	// Parse buildings, i.e. the no-fly-zones
 	public void readBuildings() {
 		conn.connToUrl(conn.getServer() + "/buildings/no-fly-zones.geojson");
-		
+
 		this.buildings = FeatureCollection.fromJson(conn.getJson());
 	}
 
 	// Parse maps, i.e. the air-quality-data
 	public void readMaps(String yyyy, String mm, String dd) {
 		conn.connToUrl(conn.getServer() + "/maps/" + yyyy + "/" + mm + "/" + dd
-				+ "/air-quality-data.json");	
-		Type listType = new TypeToken<ArrayList<AirQualityData>>() {}.getType();
+				+ "/air-quality-data.json");
+		Type listType = new TypeToken<ArrayList<AirQualityData>>() {
+		}.getType();
 		ArrayList<AirQualityData> aqData = new Gson().fromJson(conn.getJson(),
 				listType);
-		
+
 		for (int i = 0; i < aqData.size(); i++) {
 			this.sensorPositions.add(aqData.get(i).location);
 		}
@@ -64,7 +63,7 @@ public class ParseJsonFiles {
 		conn.connToUrl(conn.getServer() + "/words/" + w1 + "/" + w2 + "/" + w3
 				+ "/details.json");
 		var sensorCoords = new Gson().fromJson(conn.getJson(), Details.class);
-		
+
 		// Set coords of the sensors
 		this.wordsLng = sensorCoords.coordinates.lng;
 		this.wordsLat = sensorCoords.coordinates.lat;
