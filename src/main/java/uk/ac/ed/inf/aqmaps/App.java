@@ -18,8 +18,10 @@ public class App {
 		var httpConn = new HttpConnection(IP, PORT);
 		var flightPath = new FlightPath(httpConn);
 		flightPath.setUp();
-		var sensorsCoords = flightPath.getSensors();
+		var sensorsCoords = flightPath.getSensorsCoords();
 		System.out.println(Arrays.deepToString(sensorsCoords));
+		var sensorsFtColl = flightPath.getSensorsFtColl();
+		System.out.println(sensorsFtColl.toJson());
 		
 	}
 }

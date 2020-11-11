@@ -1,31 +1,47 @@
 package uk.ac.ed.inf.aqmaps;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.Point;
+import com.mapbox.geojson.Polygon;
+
 public class FlightPath {
 	private HttpConnection conn;
 	private double[][] sensors;
+	private FeatureCollection sensorsFtColl;
 
 	// Constructor
 	public FlightPath(HttpConnection conn) {
 		this.conn = conn;
 	}
-	
+
 	// Getters
-	public double[][] getSensors() {
+	public double[][] getSensorsCoords() {
 		return this.sensors;
+	}
+	
+	public FeatureCollection getSensorsFtColl() {
+		return this.sensorsFtColl;
 	}
 
 	public void setUp() {
 		// Confinement area
-		// TODO: draw square
+		// TODO: draw square?
 
-		// Parse all required files
+		// Create parser
 		var parser = new ParseJsonFiles(this.conn);
-		// Buildings
+		
+		// Parse buildings
 		parser.readBuildings();
 		parser.getBuildings();
-		// Sensors
-		// TODO: loop all days
-		parser.readMaps("2020", "01", "01");
+		
+		// Parse sensors
+		// TODO: loop all days?
+		parser.readMaps("2021", "02", "01");
 		var sensorsWords = parser.getSensorWords();
 		var sensorsCoords = new double[sensorsWords.size()][2];
 		for (int i = 0; i < sensorsWords.size(); i++) {
@@ -34,6 +50,23 @@ public class FlightPath {
 			sensorsCoords[i][0] = parser.getWordsLng();
 			sensorsCoords[i][1] = parser.getWordsLat();
 		}
+		
 		this.sensors = sensorsCoords;
+
+		var features = new Feature[sensorsCoords.length];
+		for (var i = 0; i < sensorsCoords.length; i++) {
+			var sensor = Point.fromLngLat(sensorsCoords[i][0],
+					sensorsCoords[i][1]);
+
+			var sensorGeo = (Geometry) sensor;
+			var sensorFt = Feature.fromGeometry(sensorGeo);
+
+			sensorFt.addStringProperty("rgb-string", "#aaaaaa");
+			sensorFt.addStringProperty("fill", "#aaaaaa");
+			sensorFt.addStringProperty("marker-symbol", "");
+			features[i] = sensorFt;
+		}
+		
+		this.sensorsFtColl = FeatureCollection.fromFeatures(features);
 	}
 }
