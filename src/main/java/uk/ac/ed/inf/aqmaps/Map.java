@@ -10,27 +10,30 @@ import com.mapbox.geojson.Geometry;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 
-public class FlightPath {
-	private HttpConnection conn;
+public class Map {
 	private static final double LNG1 = -3.192473;
 	private static final double LNG2 = -3.184319;
 	private static final double LAT1 = 55.946233;
 	private static final double LAT2 = 55.942617;
+	private ArrayList<Point> sensorsPoints = new ArrayList<Point>();
+	private Feature confFt;
+	private List<Feature> buildingsList;
 	private FeatureCollection sensorsFtColl;
-
+	
 	// Constructor
-	public FlightPath(HttpConnection conn) {
-		this.conn = conn;
+	public Map(HttpConnection conn, String yyyy, String mm, String dd) {
+		this.sensorsFtColl = findSensors(conn, yyyy, mm, dd);
+		System.out.println(this.sensorsFtColl.toJson());
 	}
-
-	// Getters
-	public FeatureCollection getSensorsFtColl() {
-		return this.sensorsFtColl;
+	
+	public ArrayList<Point> getSensorsPoints(){
+		return this.sensorsPoints;
 	}
 
 	// Methods
 	// Set up markers for sensors for a given date
-	public void setUp(String yyyy, String mm, String dd) {
+	private FeatureCollection findSensors(HttpConnection conn, String yyyy,
+			String mm, String dd) {
 		var allFts = new ArrayList<Feature>();
 		// Confinement area points to feature collection
 		var confinementPts = new ArrayList<>(Arrays.asList(
@@ -39,37 +42,39 @@ public class FlightPath {
 				Point.fromLngLat(LNG1, LAT1)));
 		var confPoly = Polygon.fromLngLats(List.of(confinementPts));
 		var confGeo = (Geometry) confPoly;
-		var confFt = Feature.fromGeometry(confGeo);
-		confFt.addNumberProperty("fill-opacity", 0);
-		allFts.add(confFt);
+		this.confFt = Feature.fromGeometry(confGeo);
+		this.confFt.addNumberProperty("fill-opacity", 0);
+		allFts.add(this.confFt);
 
 		// Create parser
-		var parser = new ParseJsonFiles(this.conn);
+		var parser = new ParseJsonFiles(conn);
 
 		// Parse buildings
 		parser.readBuildings();
-		var buildings = parser.getBuildings();
-		allFts.addAll(buildings.features());
+		this.buildingsList = parser.getBuildings().features();
+		allFts.addAll(this.buildingsList);
 
 		// Parse sensors
 		parser.readMaps(yyyy, mm, dd);
 		var sensorsWords = parser.getSensorWords();
-		var sensorsCoords = new double[sensorsWords.size()][2];
+		var sensorsSplit = new double[33][2];
 
 		// Split the 3 words up and find their coordinates
-		for (int i = 0; i < sensorsWords.size(); i++) {
+		for (int i = 0; i < 33; i++) {
 			var line = sensorsWords.get(i).split("\\.");
 			parser.readWords(line[0], line[1], line[2]);
-			sensorsCoords[i][0] = parser.getWordsLng();
-			sensorsCoords[i][1] = parser.getWordsLat();
+			sensorsSplit[i][0] = parser.getWordsLng();
+			sensorsSplit[i][1] = parser.getWordsLat();
 		}
 
-		for (var i = 0; i < sensorsCoords.length; i++) {
-			var sensor = Point.fromLngLat(sensorsCoords[i][0],
-					sensorsCoords[i][1]);
+		// Place sensors on map
+		for (var i = 0; i < 33; i++) {
+			var sensor = Point.fromLngLat(sensorsSplit[i][0],
+					sensorsSplit[i][1]);
+			this.sensorsPoints.add(sensor);
 			var sensorGeo = (Geometry) sensor;
 			var sensorFt = Feature.fromGeometry(sensorGeo);
-			// TODO: find colour and symbol dynamically
+			// Set up marker as not visited by default
 			sensorFt.addStringProperty("rgb-string", "#aaaaaa");
 			sensorFt.addStringProperty("fill", "#aaaaaa");
 			sensorFt.addStringProperty("marker-symbol", "");
@@ -77,6 +82,6 @@ public class FlightPath {
 		}
 
 		// Sensors feature collection
-		this.sensorsFtColl = FeatureCollection.fromFeatures(allFts);
+		return FeatureCollection.fromFeatures(allFts);
 	}
 }

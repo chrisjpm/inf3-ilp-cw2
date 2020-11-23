@@ -48,8 +48,8 @@ public class ParseJsonFiles {
 	public void readMaps(String yyyy, String mm, String dd) {
 		conn.connToUrl(conn.getServer() + "/maps/" + yyyy + "/" + mm + "/" + dd
 				+ "/air-quality-data.json");
-		Type listType = new TypeToken<ArrayList<AirQualityData>>() {
-		}.getType();
+		
+		Type listType = new TypeToken<ArrayList<AirQualityData>>() {}.getType();
 		ArrayList<AirQualityData> aqData = new Gson().fromJson(conn.getJson(),
 				listType);
 
@@ -62,6 +62,7 @@ public class ParseJsonFiles {
 	public void readWords(String w1, String w2, String w3) {
 		conn.connToUrl(conn.getServer() + "/words/" + w1 + "/" + w2 + "/" + w3
 				+ "/details.json");
+		
 		var sensorCoords = new Gson().fromJson(conn.getJson(), Details.class);
 
 		// Set coords of the sensors
