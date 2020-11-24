@@ -23,18 +23,21 @@ public class App {
 
 		// Set up a connection to our choice of server
 		var httpConn = new HttpConnection(IP, port);
+		
+		// Create parser
+		var parser = new JsonParser(httpConn);
 
 		// Create a new flight map and drone
-		var map = new Map(httpConn, yyyy, mm, dd);
+		var map = new Map(parser, yyyy, mm, dd);
 		var startPos = new DronePosition(lat, lng);
 		var drone = new Drone(map, startPos);
 
 		// Start flight path (1 move costs 1 battery power)
-		//for (int i = 0; i < Drone.BATTERY_POWER; i++) {
-			//drone.nextMove();
-		//}
-
-		var flight = drone.drawPath();
-		System.out.println(flight.toJson());
+//		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
+//			drone.nextMove();
+//		}
+		
+		drone.nextMove();
+		System.out.println(drone.drawPath().toJson());
 	}
 }

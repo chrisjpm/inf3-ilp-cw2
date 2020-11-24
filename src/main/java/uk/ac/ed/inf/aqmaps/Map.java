@@ -19,11 +19,12 @@ public class Map {
 	
 	private Feature confFt;
 	private List<Feature> buildingsList;
-	private List<Point> sensorsPoints = new ArrayList<Point>();
+	private List<String> markerColours, markerSymbols;
+	private double[][] sensorsCoords = new double[SENSORS][2];
 	private List<Feature> sensorsFts = new ArrayList<Feature>();
 
 	// Constructor
-	public Map(HttpConnection conn, String yyyy, String mm, String dd) {
+	public Map(JsonParser conn, String yyyy, String mm, String dd) {
 		setUpMap(conn, yyyy, mm, dd);
 	}
 
@@ -36,8 +37,16 @@ public class Map {
 		return buildingsList;
 	}
 	
-	public List<Point> getSensorsPoints() {
-		return this.sensorsPoints;
+	public double[][] getSensorsCoords() {
+		return this.sensorsCoords;
+	}
+	
+	public List<String> getMarkerColours() {
+		return this.markerColours;
+	}
+	
+	public List<String> getMarkerSymbols() {
+		return this.markerSymbols;
 	}
 
 	public List<Feature> getSensorsFts() {
@@ -46,11 +55,8 @@ public class Map {
 
 	// Methods
 	// Set up markers for sensors for a given date
-	private void setUpMap(HttpConnection conn, String yyyy, String mm,
+	private void setUpMap(JsonParser parser, String yyyy, String mm,
 			String dd) {
-		
-		// Create parser
-		var parser = new ParseJsonFiles(conn);
 
 		// Confinement area points to feature collection
 		var confinementPts = new ArrayList<>(Arrays.asList(
@@ -69,21 +75,24 @@ public class Map {
 		// Parse sensors
 		parser.readMaps(yyyy, mm, dd);
 		var sensorsWords = parser.getSensorWords();
-		var sensorsSplit = new double[33][2];
+		this.sensorsCoords = new double[33][2];
+		var sensorsBattery = parser.getSensorBatteries();
+		var sensorsReading = parser.getSensorReadings();
 
-		// Split the 3 words up and find their coordinates
-		for (int i = 0; i < 33; i++) {
+		// 1. Split the 3 words up and find their coordinates
+		// 2. Convert sensors to features and add to a list
+		var sensorsPoints = new ArrayList<Point>();
+		for (int i = 0; i < SENSORS; i++) {
+			// 1
 			var line = sensorsWords.get(i).split("\\.");
 			parser.readWords(line[0], line[1], line[2]);
-			sensorsSplit[i][0] = parser.getWordsLng();
-			sensorsSplit[i][1] = parser.getWordsLat();
-		}
-
-		// Convert sensors to features and add to a list
-		for (var i = 0; i < SENSORS; i++) {
-			var sensor = Point.fromLngLat(sensorsSplit[i][0],
-					sensorsSplit[i][1]);
-			this.sensorsPoints.add(sensor);
+			this.sensorsCoords[i][0] = parser.getWordsLng();
+			this.sensorsCoords[i][1] = parser.getWordsLat();
+			
+			// 2
+			var sensor = Point.fromLngLat(this.sensorsCoords[i][0],
+					this.sensorsCoords[i][1]);
+			sensorsPoints.add(sensor);
 			var sensorGeo = (Geometry) sensor;
 			var sensorFt = Feature.fromGeometry(sensorGeo);
 			// Set up marker as not visited by default
@@ -92,6 +101,12 @@ public class Map {
 			sensorFt.addStringProperty("marker-symbol", "");
 			this.sensorsFts.add(sensorFt);
 		}
+		
+		// Get pollution data from all sensors
+		var pollution = new PollutionLookUp();
+		pollution.lookUp(sensorsBattery, sensorsReading);
+		this.markerColours = pollution.getMarkerColours();
+		this.markerSymbols = pollution.getMarkerSymbols();
 		
 	}
 }

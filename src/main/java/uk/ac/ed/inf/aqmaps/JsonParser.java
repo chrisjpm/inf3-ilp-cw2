@@ -1,21 +1,24 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import com.mapbox.geojson.FeatureCollection;
 
-public class ParseJsonFiles {
+public class JsonParser {
 	private HttpConnection conn;
 	private FeatureCollection buildings;
-	private ArrayList<String> sensorPositions = new ArrayList<String>();
+	private List<String> sensorsWords = new ArrayList<String>();
+	private List<Double> sensorsBattery = new ArrayList<Double>();
+	private List<String> sensorsReading = new ArrayList<String>();
 	private double wordsLng;
 	private double wordsLat;
 
 	// Constructor
-	public ParseJsonFiles(HttpConnection conn) {
+	public JsonParser(HttpConnection conn) {
 		this.conn = conn;
 	}
 
@@ -24,8 +27,16 @@ public class ParseJsonFiles {
 		return this.buildings;
 	}
 
-	public ArrayList<String> getSensorWords() {
-		return this.sensorPositions;
+	public List<String> getSensorWords() {
+		return this.sensorsWords;
+	}
+	
+	public List<Double> getSensorBatteries() {
+		return this.sensorsBattery;
+	}
+	
+	public List<String> getSensorReadings() {
+		return this.sensorsReading;
 	}
 
 	public double getWordsLng() {
@@ -54,7 +65,9 @@ public class ParseJsonFiles {
 				listType);
 
 		for (int i = 0; i < aqData.size(); i++) {
-			this.sensorPositions.add(aqData.get(i).location);
+			this.sensorsWords.add(aqData.get(i).location);			
+			this.sensorsBattery.add(aqData.get(i).battery);
+			this.sensorsReading.add(aqData.get(i).reading);
 		}
 	}
 
