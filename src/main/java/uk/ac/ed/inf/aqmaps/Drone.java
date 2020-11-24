@@ -1,18 +1,21 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.MultiLineString;
 import com.mapbox.geojson.Point;
-import com.mapbox.turf.TurfConstants;
-import com.mapbox.turf.TurfMeasurement;
 
 public class Drone {
-	private Map map;
-	private DronePosition dronePos, endPos;
-	private ArrayList<Point> vistedSensors = new ArrayList<Point>();
 	public static final int BATTERY_POWER = 150;
 	public static final double MOVE_DIST = 0.0003;
 	private static final double READ_SENSOR_ANGLE = 0.0002;
+	private Map map;
+	private DronePosition dronePos, endPos;
+	private ArrayList<Point> vistedSensors = new ArrayList<Point>();
 
 	// Constructor
 	public Drone(Map map, DronePosition startPos) {
@@ -25,41 +28,22 @@ public class Drone {
 	// Methods
 	public void nextMove() {
 		var currentPos = this.dronePos;
-		
-		if (this.vistedSensors.size() != 33) {
-			var nextGoal = nearestSensorToDrone();
-			System.out.println(nextGoal);
-		} else {
-			var nextGoal = this.endPos;
-		}
-		
-		//pick direction
-		//change position by angle to get to target and movement dist
 	}
-
-	public Point nearestSensorToDrone() {
-		// Find dist to all points from current pos
-		var sensorsPoints = this.map.getSensorsPoints();
-		var dronePoint = Point.fromLngLat(this.dronePos.getLng(),
-				this.dronePos.getLat());
-		var minDist = TurfMeasurement.distance(dronePoint, sensorsPoints.get(0),
-				TurfConstants.UNIT_DEGREES);
-		var minIdx = 0;
-
-		for (int i = 0; i < sensorsPoints.size(); i++) {
-			if (!this.vistedSensors.contains(sensorsPoints.get(i))) {
-				var dist = TurfMeasurement.distance(dronePoint,
-						sensorsPoints.get(i), TurfConstants.UNIT_DEGREES);
-				// if no fly zone isnt infront then
-				if (dist < minDist) {
-					minDist = dist;
-					minIdx = i; 
-				}
-			}			
-		}
+	
+	public FeatureCollection drawPath() {
+		var sensors = this.map.getSensorsPoints(); // TODO: get reordered sensors
+		var flightMultiLine = MultiLineString.fromLngLats(List.of(sensors));
 		
-		this.vistedSensors.add(sensorsPoints.get(minIdx));	
-		return sensorsPoints.get(minIdx);
+		var flightGeo = (Geometry) flightMultiLine;
+		var pathFt = Feature.fromGeometry(flightGeo);
+		var flight = new ArrayList<Feature>();
+		flight.add(pathFt);
+		flight.addAll(this.map.getSensorsFts());
+		flight.add(this.map.getConfFt());
+		flight.addAll(this.map.getBuildingsFts());
+		var flightFtColl = FeatureCollection.fromFeatures(flight);
+		
+		return flightFtColl;
 	}
 
 }

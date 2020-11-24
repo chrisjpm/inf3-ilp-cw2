@@ -1,8 +1,5 @@
 package uk.ac.ed.inf.aqmaps;
 
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Point;
-
 /**
  * 
  * @author Chris Perceval-Maxwell (s1839592)
@@ -37,6 +34,7 @@ public class App {
 			//drone.nextMove();
 		//}
 
-		drone.nextMove();
+		var flight = drone.drawPath();
+		System.out.println(flight.toJson());
 	}
 }
