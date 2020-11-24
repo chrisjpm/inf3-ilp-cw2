@@ -9,7 +9,7 @@ public class PollutionLookUp {
 
 	// Constructor
 	public PollutionLookUp() {
-		
+
 	}
 
 	// Getters
@@ -22,10 +22,22 @@ public class PollutionLookUp {
 	}
 
 	// Methods
-
 	public void lookUp(List<Double> batteries, List<String> readings) {
 		for (var i = 0; i < Map.SENSORS; i++) {
-			if (Double.parseDouble(readings.get(i)) >= 0.1
+			System.out.println(i);
+			if (readings.get(i) == "null" || readings.get(i) == "NaN"){
+				this.markerColour.add("#000000");
+				this.markerSymbol.add("cross");
+				continue;
+			}
+			
+			if (batteries.get(i) < 10) {
+				this.markerColour.add("#000000");
+				this.markerSymbol.add("cross");
+				continue;
+			}
+			
+			if (Double.parseDouble(readings.get(i)) >= 0
 					&& Double.parseDouble(readings.get(i)) < 32) {
 				this.markerColour.add("#00ff00");
 				this.markerSymbol.add("lighthouse");
@@ -57,9 +69,6 @@ public class PollutionLookUp {
 					&& Double.parseDouble(readings.get(i)) < 256) {
 				this.markerColour.add("#ff0000");
 				this.markerSymbol.add("danger");
-			} else {
-				this.markerColour.add("#000000");
-				this.markerSymbol.add("cross");
 			}
 		}
 	}

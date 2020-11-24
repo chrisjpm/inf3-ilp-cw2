@@ -24,8 +24,8 @@ public class Map {
 	private List<Feature> sensorsFts = new ArrayList<Feature>();
 
 	// Constructor
-	public Map(JsonParser conn, String yyyy, String mm, String dd) {
-		setUpMap(conn, yyyy, mm, dd);
+	public Map(JsonParser parser, String yyyy, String mm, String dd) {
+		setUpMap(parser, yyyy, mm, dd);
 	}
 
 	// Getters
@@ -104,6 +104,8 @@ public class Map {
 		
 		// Get pollution data from all sensors
 		var pollution = new PollutionLookUp();
+		System.out.println(sensorsBattery);
+		System.out.println(sensorsReading);
 		pollution.lookUp(sensorsBattery, sensorsReading);
 		this.markerColours = pollution.getMarkerColours();
 		this.markerSymbols = pollution.getMarkerSymbols();
