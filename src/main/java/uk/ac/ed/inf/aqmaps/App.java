@@ -32,23 +32,18 @@ public class App {
 		// Create a new flight map and drone
 		var map = new Map(parser, yyyy, mm, dd);
 		var startPos = new Coords(map, lat, lng);
-		//var drone = new Drone(map, startPos);
-		Drone drone = null;
-		Coords nextPos = new Coords(map, 55.9432, -3.1860); // testing valid moves with start postion to first move
-		if (startPos.validDroneMove(nextPos)) {
-			drone = new Drone(map, startPos);
-		} else {
-			System.out.println(
-					"Fatal error");
-			System.exit(1);
-		}
+		var drone = new Drone(map, startPos);
+		Drone drone2 = null;
+		Coords nextPos = new Coords(map, 55.9427, -3.1898); // testing valid moves with start postion to first move
+		startPos.validDroneMove(nextPos);
+		drone2 = new Drone(map, startPos);
 
 		// Start flight path (1 move costs 1 battery power)
 //		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 //			drone.nextMove();
 //		}
 
-		drone.moveToSensors();
+		drone2.moveToSensors();
 		System.out.println(map.drawPath(drone.getFlightPath()).toJson());
 	}
 }

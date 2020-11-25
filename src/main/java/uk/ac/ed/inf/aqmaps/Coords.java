@@ -27,7 +27,7 @@ public class Coords {
 	public double getLat() {
 		return this.lat;
 	}
-	
+
 	public double getLng() {
 		return this.lng;
 	}
@@ -49,49 +49,62 @@ public class Coords {
 	}
 
 	public boolean validDroneMove(Coords nextPos) {
-		// In confinement area
-//		var inConfinements = TurfJoins.inside(getPoint(),
-//				this.map.getConfPoly());
-
-		// In no-fly zone
-//		var noFlyZones = this.map.getNoFlyZones();
-//		var inFlyZone = false;
-//		for (int i = 0; i < noFlyZones.size(); i++) {
-//			var checkPoint = TurfJoins.inside(getPoint(),
-//					(Polygon) noFlyZones.get(i));
-//			if (checkPoint) {
-//				inFlyZone = true;
-//				break;
-//			}
-//		}
+		// Proposed move
+		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.getLat(),
+				nextPos.getLng());
+		var line = new ArrayList<>(Arrays.asList(getPoint(), nextPos.getPoint()));
+		System.out.println((LineString.fromLngLats(line)).toJson());
+		System.out.println((nextPos.getPoint()).toJson());
+		// List of buildings
+		String[] buildings = { "Appleton Tower", "David Hume Tower",
+				"Main Library", "Informatics Forum" };
 
 		// Crossing confinement area border
 		var crossConfinements = false;
-		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.getLat(), nextPos.getLng());
-		System.out.println(this.lat + " " + this.lng);
-		System.out.println(nextPos.getLat() + " " + nextPos.getLng());
-		var confCorners = this.map.getConfPoints();
-		System.out.println(confCorners.get(2).coordinates().get(1) + " " + confCorners.get(2).coordinates().get(0));
-		System.out.println(confCorners.get(3).coordinates().get(1) + " " + confCorners.get(3).coordinates().get(0));
-		System.out.println(confCorners.size());
-		for (int i = 0; i < confCorners.size(); i++) {
-			int j = (i + 1) % confCorners.size();
-			Line2D edge = new Line2D.Double(
-					confCorners.get(i).coordinates().get(1),
-					confCorners.get(i).coordinates().get(0),
-					confCorners.get(j).coordinates().get(1),
-					confCorners.get(j).coordinates().get(0));
-			if (linePath.intersectsLine(edge)) {
-				System.out.println("got here at " + i);
+		var confPoints = this.map.getConfPoints();
+
+		for (int i = 0; i < confPoints.size(); i++) {
+			int j = (i + 1) % confPoints.size();
+			Line2D barrier = new Line2D.Double(
+					confPoints.get(i).coordinates().get(1),
+					confPoints.get(i).coordinates().get(0),
+					confPoints.get(j).coordinates().get(1),
+					confPoints.get(j).coordinates().get(0));
+
+			if (linePath.intersectsLine(barrier)) {
+				System.out.println(
+						">> Illegal move! Attempted to fly out of confinemeant area.");
 				crossConfinements = true;
 				break;
 			}
+			if (crossConfinements) { break; }
 		}
 
 		// Crossing a no-fly-zone border
 		// TODO
+		var crossNoFlyZone = false;
+		var noFlyZones = this.map.getNoFlyZones();
+		for (int i = 0; i < noFlyZones.size(); i++) {
+			var nfzPoly = (Polygon) noFlyZones.get(i);
+			var nfzPoints = nfzPoly.coordinates().get(0);
 
-		// return inConfinements && !inFlyZone;
-		return !crossConfinements;
+			for (int j = 0; j < nfzPoints.size(); j++) {
+				int k = (j + 1) % nfzPoints.size();
+				Line2D barrier = new Line2D.Double(nfzPoints.get(j).latitude(),
+						nfzPoints.get(j).longitude(),
+						nfzPoints.get(k).latitude(),
+						nfzPoints.get(k).longitude());
+				if (linePath.intersectsLine(barrier)) {
+					System.out.println(
+							">> Illegal move! Attmpeted to fly through building '"
+									+ buildings[i] + "'.");
+					crossNoFlyZone = true;
+					break;
+				}
+			}
+			if (crossNoFlyZone) { break; }
+		}
+
+		return !crossConfinements && !crossNoFlyZone;
 	}
 }

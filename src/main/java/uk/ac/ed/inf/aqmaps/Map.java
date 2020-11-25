@@ -29,7 +29,7 @@ public class Map {
 		this.noFlyZones = new ArrayList<Geometry>();
 		this.sensorsCoords = new double[SENSORS][2];
 		this.sensorsFts = new ArrayList<Feature>();
-		
+
 		setUpMap(parser, yyyy, mm, dd);
 	}
 
@@ -65,8 +65,12 @@ public class Map {
 		// Confinement area points to feature collection
 		this.confPoints = new ArrayList<>(Arrays.asList(
 				Point.fromLngLat(LNG1, LAT1), Point.fromLngLat(LNG2, LAT1),
-				Point.fromLngLat(LNG2, LAT2), Point.fromLngLat(LNG1, LAT2)));
-		
+				Point.fromLngLat(LNG2, LAT2), Point.fromLngLat(LNG1, LAT2),
+				Point.fromLngLat(LNG1, LAT1)));
+		var x = LineString.fromLngLats(confPoints);
+		System.out.println(x.toJson());
+		System.out.println("hfdgfcujxch");
+
 		// Parse buildings
 		parser.readBuildings();
 		var buildingsList = parser.getBuildings();
