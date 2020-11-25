@@ -24,7 +24,6 @@ public class PollutionLookUp {
 	// Methods
 	public void lookUp(List<Double> batteries, List<String> readings) {
 		for (var i = 0; i < Map.SENSORS; i++) {
-			System.out.println(i);
 			if (readings.get(i) == "null" || readings.get(i) == "NaN"){
 				this.markerColour.add("#000000");
 				this.markerSymbol.add("cross");

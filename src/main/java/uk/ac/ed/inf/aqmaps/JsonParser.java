@@ -6,16 +6,17 @@ import java.util.List;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
+import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 
 public class JsonParser {
 	private HttpConnection conn;
-	private FeatureCollection buildings;
+	private List<Feature> buildings;
 	private List<String> sensorsWords = new ArrayList<String>();
 	private List<Double> sensorsBattery = new ArrayList<Double>();
 	private List<String> sensorsReading = new ArrayList<String>();
 	private double wordsLng;
-	private double wordsLat;
+	private double wordsLat;	
 
 	// Constructor
 	public JsonParser(HttpConnection conn) {
@@ -23,7 +24,7 @@ public class JsonParser {
 	}
 
 	// Getters
-	public FeatureCollection getBuildings() {
+	public List<Feature> getBuildings() {
 		return this.buildings;
 	}
 
@@ -52,7 +53,7 @@ public class JsonParser {
 	public void readBuildings() {
 		conn.connToUrl(conn.getServer() + "/buildings/no-fly-zones.geojson");
 
-		this.buildings = FeatureCollection.fromJson(conn.getJson());
+		this.buildings = FeatureCollection.fromJson(conn.getJson()).features();	
 	}
 
 	// Parse maps, i.e. the air-quality-data
