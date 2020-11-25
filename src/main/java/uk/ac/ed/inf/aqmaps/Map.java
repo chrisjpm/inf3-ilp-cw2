@@ -67,9 +67,6 @@ public class Map {
 				Point.fromLngLat(LNG1, LAT1), Point.fromLngLat(LNG2, LAT1),
 				Point.fromLngLat(LNG2, LAT2), Point.fromLngLat(LNG1, LAT2),
 				Point.fromLngLat(LNG1, LAT1)));
-		var x = LineString.fromLngLats(confPoints);
-		System.out.println(x.toJson());
-		System.out.println("hfdgfcujxch");
 
 		// Parse buildings
 		parser.readBuildings();

@@ -34,7 +34,7 @@ public class App {
 		var startPos = new Coords(map, lat, lng);
 		var drone = new Drone(map, startPos);
 		Drone drone2 = null;
-		Coords nextPos = new Coords(map, 55.9427, -3.1898); // testing valid moves with start postion to first move
+		Coords nextPos = new Coords(map, 55.9427, -3.1818); // testing valid moves with start postion to first move
 		startPos.validDroneMove(nextPos);
 		drone2 = new Drone(map, startPos);
 

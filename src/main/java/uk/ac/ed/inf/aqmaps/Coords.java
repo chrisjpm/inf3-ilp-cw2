@@ -52,9 +52,9 @@ public class Coords {
 		// Proposed move
 		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.getLat(),
 				nextPos.getLng());
-		var line = new ArrayList<>(Arrays.asList(getPoint(), nextPos.getPoint()));
-		System.out.println((LineString.fromLngLats(line)).toJson());
-		System.out.println((nextPos.getPoint()).toJson());
+		var line = new ArrayList<>(
+				Arrays.asList(getPoint(), nextPos.getPoint()));
+		
 		// List of buildings
 		String[] buildings = { "Appleton Tower", "David Hume Tower",
 				"Main Library", "Informatics Forum" };
@@ -63,7 +63,7 @@ public class Coords {
 		var crossConfinements = false;
 		var confPoints = this.map.getConfPoints();
 
-		for (int i = 0; i < confPoints.size(); i++) {
+		for (int i = 0; i < confPoints.size() - 1; i++) {
 			int j = (i + 1) % confPoints.size();
 			Line2D barrier = new Line2D.Double(
 					confPoints.get(i).coordinates().get(1),
@@ -77,18 +77,19 @@ public class Coords {
 				crossConfinements = true;
 				break;
 			}
-			if (crossConfinements) { break; }
+			if (crossConfinements) {
+				break;
+			}
 		}
 
 		// Crossing a no-fly-zone border
-		// TODO
 		var crossNoFlyZone = false;
 		var noFlyZones = this.map.getNoFlyZones();
 		for (int i = 0; i < noFlyZones.size(); i++) {
 			var nfzPoly = (Polygon) noFlyZones.get(i);
 			var nfzPoints = nfzPoly.coordinates().get(0);
 
-			for (int j = 0; j < nfzPoints.size(); j++) {
+			for (int j = 0; j < nfzPoints.size() - 1; j++) {
 				int k = (j + 1) % nfzPoints.size();
 				Line2D barrier = new Line2D.Double(nfzPoints.get(j).latitude(),
 						nfzPoints.get(j).longitude(),
@@ -102,7 +103,9 @@ public class Coords {
 					break;
 				}
 			}
-			if (crossNoFlyZone) { break; }
+			if (crossNoFlyZone) {
+				break;
+			}
 		}
 
 		return !crossConfinements && !crossNoFlyZone;
