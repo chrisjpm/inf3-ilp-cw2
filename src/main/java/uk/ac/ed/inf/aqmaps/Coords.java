@@ -63,7 +63,7 @@ public class Coords {
 		var crossConfinements = false;
 		var confPoints = this.map.getConfPoints();
 
-		for (int i = 0; i < confPoints.size() - 1; i++) {
+		for (int i = 0; i < confPoints.size() - 1; i++) { // Fist & last point are the same
 			int j = (i + 1) % confPoints.size();
 			Line2D barrier = new Line2D.Double(
 					confPoints.get(i).coordinates().get(1),
@@ -89,7 +89,7 @@ public class Coords {
 			var nfzPoly = (Polygon) noFlyZones.get(i);
 			var nfzPoints = nfzPoly.coordinates().get(0);
 
-			for (int j = 0; j < nfzPoints.size() - 1; j++) {
+			for (int j = 0; j < nfzPoints.size() - 1; j++) { // Fist & last point are the same
 				int k = (j + 1) % nfzPoints.size();
 				Line2D barrier = new Line2D.Double(nfzPoints.get(j).latitude(),
 						nfzPoints.get(j).longitude(),
