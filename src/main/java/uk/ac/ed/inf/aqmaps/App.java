@@ -29,22 +29,15 @@ public class App {
 
 		// Create a new flight map and drone
 		var map = new Map(parser, yyyy, mm, dd);
-		var startPos = new DronePosition(map, lat, lng);
-		Drone drone = null;
-		if (startPos.validPosition()) {
-			drone = new Drone(map, startPos);
-		} else {
-			System.out.println(
-					"Fatal error: Starting Position must be with the confinement area.");
-			System.exit(1);
-		}
+		var startPos = new Coords(map, lat, lng);
+		var drone = new Drone(map, startPos);
 
 		// Start flight path (1 move costs 1 battery power)
 //		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 //			drone.nextMove();
 //		}
 
-		drone.nextMove();
-		System.out.println(drone.drawPath().toJson());
+		drone.moveToSensors();
+		System.out.println(map.drawPath(drone.getFlightPath()).toJson());
 	}
 }

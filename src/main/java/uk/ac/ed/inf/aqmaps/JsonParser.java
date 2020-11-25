@@ -12,15 +12,18 @@ import com.mapbox.geojson.FeatureCollection;
 public class JsonParser {
 	private HttpConnection conn;
 	private List<Feature> buildings;
-	private List<String> sensorsWords = new ArrayList<String>();
-	private List<Double> sensorsBattery = new ArrayList<Double>();
-	private List<String> sensorsReading = new ArrayList<String>();
+	private List<String> sensorsWords;
+	private List<Double> sensorsBattery;
+	private List<String> sensorsReading;
 	private double wordsLng;
 	private double wordsLat;	
 
 	// Constructor
 	public JsonParser(HttpConnection conn) {
 		this.conn = conn;
+		this.sensorsWords = new ArrayList<String>();
+		this.sensorsBattery = new ArrayList<Double>();
+		this.sensorsReading = new ArrayList<String>();
 	}
 
 	// Getters

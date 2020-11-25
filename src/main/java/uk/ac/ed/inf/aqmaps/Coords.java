@@ -4,13 +4,13 @@ import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 import com.mapbox.turf.TurfJoins;
 
-public class DronePosition {
+public class Coords {
 	private Map map;
 	private double lat;
 	private double lng;
 
 	// Constructor
-	public DronePosition(Map map, double lat, double lng) {
+	public Coords(Map map, double lat, double lng) {
 		this.map = map;
 		this.lat = lat;
 		this.lng = lng;
@@ -30,7 +30,7 @@ public class DronePosition {
 	}
 
 	// Methods
-	public DronePosition nextPos(Movement move) {
+	public Coords nextDronePos(Movement move) {
 		// Calculate the resulting coordinates from moving in the given
 		// direction
 		// double nextLat = this.lat + Drone.MOVE_DIST * move.cos();
@@ -41,7 +41,7 @@ public class DronePosition {
 		return null;
 	}
 
-	public boolean validPosition() {
+	public boolean validDronePosition() {
 		// In confinement area
 		var inConfinements = TurfJoins.inside(
 				Point.fromLngLat(this.lng, this.lat), this.map.getConfPoly());

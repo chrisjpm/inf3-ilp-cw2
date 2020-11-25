@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PollutionLookUp {
-	private List<String> markerColour = new ArrayList<String>();
-	private List<String> markerSymbol = new ArrayList<String>();
+	private List<String> markerColour;
+	private List<String> markerSymbol;
 
 	// Constructor
 	public PollutionLookUp() {
-
+		this.markerColour = new ArrayList<String>();
+		this.markerSymbol = new ArrayList<String>();
 	}
 
 	// Getters

@@ -6,33 +6,52 @@ import java.util.List;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.MultiLineString;
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 
 public class Drone {
 	public static final int BATTERY_POWER = 150;
 	public static final double MOVE_DIST = 0.0003;
-	// private static final double READ_SENSOR_ANGLE = 0.0002;
 	private Map map;
-	private DronePosition dronePos, startPos;
-	private List<Point> visitedPoss = new ArrayList<Point>();
-	// private List<Feature> visitedSensors = new ArrayList<Feature>();
+	private Coords dronePos;
+	private List<Point> visitedPoss;
 
 	// Constructor
-	public Drone(Map map, DronePosition startPos) {
+	public Drone(Map map, Coords startPos) {
 		this.map = map;
 		this.dronePos = startPos;
-		this.startPos = startPos;
+		this.visitedPoss = new ArrayList<Point>();
+		
+		this.visitedPoss.add(this.dronePos.getPoint());
+	}
+	
+	// Getters
+	public List<Point> getFlightPath() {
+		return this.visitedPoss;
 	}
 
 	// Methods
 	// Move drone to next position
 	public void nextMove() {
+		var prevPos = this.dronePos;
+		
+		// TODO: Move drone
+		// ...
+		
+		// TODO: Attempt to collect readings
+		//var targetSensor = new Sensor(targetSensorPos);
+		
+		this.visitedPoss.add(this.dronePos.getPoint());
+	}
+	
+	// Testing path and updating markers
+	public void moveToSensors() {
+		var startPos = this.dronePos;
 		this.visitedPoss.add(this.dronePos.getPoint()); // current pos
 
 		for (int i = 0; i < Map.SENSORS; i++) {
 			// Add current position to list of visited positions
-			var nextPos = new DronePosition(this.map, this.map.getSensorsCoords()[i][1],
+			var nextPos = new Coords(this.map, this.map.getSensorsCoords()[i][1],
 					this.map.getSensorsCoords()[i][0]);
 			this.visitedPoss.add(nextPos.getPoint()); // since this would not actually be a loop, this would be dealt with at the end 
 
@@ -49,24 +68,6 @@ public class Drone {
 		}
 
 		// Keep track of drone's path
-		this.visitedPoss.add(this.startPos.getPoint()); // this is start pos jut to get back there for sake of testing
+		this.visitedPoss.add(startPos.getPoint()); // this is start pos jut to get back there for sake of testing
 	}
-
-	// Draw the flight path
-	public FeatureCollection drawPath() {
-		var flightMultiLine = MultiLineString
-				.fromLngLats(List.of(this.visitedPoss));
-		var flightGeo = (Geometry) flightMultiLine;
-		var flightFt = Feature.fromGeometry(flightGeo);
-
-		var flightList = new ArrayList<Feature>();
-		flightList.add(flightFt);
-		flightList.addAll(this.map.getSensorsFts());
-		//flightList.add(this.map.getConfFt());
-		//flightList.addAll(this.map.getBuildings());
-		var flightFtColl = FeatureCollection.fromFeatures(flightList);
-
-		return flightFtColl;
-	}
-
 }
