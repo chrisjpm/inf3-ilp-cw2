@@ -17,7 +17,7 @@ public class Map {
 	private static final double LNG2 = -3.184319;
 	private static final double LAT1 = 55.946233;
 	private static final double LAT2 = 55.942617;
-	private Polygon confPoly;
+	private List<Point> confPoints;
 	private List<Geometry> noFlyZones;
 	private double[][] sensorsCoords;
 	private List<Feature> sensorsFts;
@@ -25,6 +25,7 @@ public class Map {
 
 	// Constructor
 	public Map(JsonParser parser, String yyyy, String mm, String dd) {
+		this.confPoints = new ArrayList<Point>();
 		this.noFlyZones = new ArrayList<Geometry>();
 		this.sensorsCoords = new double[SENSORS][2];
 		this.sensorsFts = new ArrayList<Feature>();
@@ -33,8 +34,8 @@ public class Map {
 	}
 
 	// Getters
-	public Polygon getConfPoly() {
-		return confPoly;
+	public List<Point> getConfPoints() {
+		return confPoints;
 	}
 
 	public List<Geometry> getNoFlyZones() {
@@ -62,12 +63,10 @@ public class Map {
 			String dd) {
 
 		// Confinement area points to feature collection
-		var confinementPts = new ArrayList<>(Arrays.asList(
+		this.confPoints = new ArrayList<>(Arrays.asList(
 				Point.fromLngLat(LNG1, LAT1), Point.fromLngLat(LNG2, LAT1),
-				Point.fromLngLat(LNG2, LAT2), Point.fromLngLat(LNG1, LAT2),
-				Point.fromLngLat(LNG1, LAT1)));
-		this.confPoly = Polygon.fromLngLats(List.of(confinementPts));
-
+				Point.fromLngLat(LNG2, LAT2), Point.fromLngLat(LNG1, LAT2)));
+		
 		// Parse buildings
 		parser.readBuildings();
 		var buildingsList = parser.getBuildings();

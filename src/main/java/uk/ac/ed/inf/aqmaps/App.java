@@ -1,5 +1,7 @@
 package uk.ac.ed.inf.aqmaps;
 
+import com.mapbox.geojson.Point;
+
 /**
  * 
  * @author Chris Perceval-Maxwell (s1839592)
@@ -30,7 +32,16 @@ public class App {
 		// Create a new flight map and drone
 		var map = new Map(parser, yyyy, mm, dd);
 		var startPos = new Coords(map, lat, lng);
-		var drone = new Drone(map, startPos);
+		//var drone = new Drone(map, startPos);
+		Drone drone = null;
+		Coords nextPos = new Coords(map, 55.9432, -3.1860); // testing valid moves with start postion to first move
+		if (startPos.validDroneMove(nextPos)) {
+			drone = new Drone(map, startPos);
+		} else {
+			System.out.println(
+					"Fatal error");
+			System.exit(1);
+		}
 
 		// Start flight path (1 move costs 1 battery power)
 //		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
