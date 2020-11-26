@@ -25,6 +25,15 @@ public class Coords {
 	public double getLng() {
 		return this.lng;
 	}
+	
+	// Setters
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+	
+	public void setLng(double lng) {
+		this.lng = lng;
+	}
 
 	public Point getPoint() {
 		return Point.fromLngLat(this.lng, this.lat);
@@ -42,10 +51,10 @@ public class Coords {
 		return null;
 	}
 
-	public boolean validDroneMove(Coords nextPos) {
+	public boolean validDroneMove(Point nextPos) {
 		// Proposed move
-		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.getLat(),
-				nextPos.getLng());
+		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.latitude(),
+				nextPos.longitude());
 		
 		// List of buildings
 		String[] buildings = { "Appleton Tower", "David Hume Tower",

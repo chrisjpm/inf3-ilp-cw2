@@ -1,24 +1,29 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
+import com.mapbox.turf.TurfConstants;
+import com.mapbox.turf.TurfMeasurement;
 
 public class Drone {
 	public static final int BATTERY_POWER = 150;
 	public static final double MOVE_DIST = 0.0003;
 	private Map map;
-	public Point dronePos;
+	public Coords dronePos;
 	private List<Point> visitedPoss;
+	public List<Point> line = new ArrayList<>();
 
 	// Constructor
 	public Drone(Map map, Coords startPos) {
 		this.map = map;
-		this.dronePos = startPos.getPoint();
+		this.dronePos = startPos;
 		this.visitedPoss = new ArrayList<Point>();
 		
-		this.visitedPoss.add(this.dronePos);
+		this.visitedPoss.add(this.dronePos.getPoint());
 	}
 	
 	// Getters
@@ -29,21 +34,33 @@ public class Drone {
 	// Methods
 	// Move drone to next position
 	public void nextMove() {
-		//var prevPos = this.dronePos;
+		var prevPos = this.dronePos;
+		var targetPos = new Coords(this.map, this.map.getSensorsCoords()[6][1],
+				this.map.getSensorsCoords()[6][0]); // closest sensor & not visited
 		
-		// TODO: Move drone
-		// ...
+		// TODO: Move drone		
+		var bearingToTarget = Math.round((TurfMeasurement.bearing(prevPos.getPoint(), targetPos.getPoint())/10))*10; // TODO: convert to E 000 and ACW
+		System.out.println(bearingToTarget);
+		
+		var nextPos = TurfMeasurement.destination(prevPos.getPoint(), 0.0003, bearingToTarget, TurfConstants.UNIT_DEGREES); // TODO: make own destination method
+		System.out.println(nextPos.toJson());
+
+		this.line.add(prevPos.getPoint());
+		
+		prevPos.validDroneMove(nextPos);
+		this.dronePos.setLat(nextPos.latitude());
+		this.dronePos.setLng(nextPos.longitude());
 		
 		// TODO: Attempt to collect readings
-		//var targetSensor = new Sensor(targetSensorPos);
+		// ...
 		
 		//this.visitedPoss.add(this.dronePos.getPoint());
 	}
 	
 	// Testing path and updating markers
 	public void moveToSensors() {
-		var startPos = this.dronePos;
-		this.visitedPoss.add(this.dronePos); // current pos
+		var startPos = this.dronePos.getPoint();
+		this.visitedPoss.add(this.dronePos.getPoint()); // current pos
 
 		for (int i = 0; i < Map.SENSORS; i++) {
 			// Add current position to list of visited positions

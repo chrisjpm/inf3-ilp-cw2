@@ -42,58 +42,19 @@ public class App {
 		var drone = new Drone(map, startPos);
 		var drone2 = new Drone(map, startPos);
 		Coords target = new Coords(map, 55.9435, -3.1877); // testing valid moves with start postion to first move
-		startPos.validDroneMove(target);
-		
-		//testing
-		drone.dronePos = startPos.getPoint();
-		
-		List<Point> line = new ArrayList<>(Arrays.asList(
-				startPos.getPoint(), target.getPoint()));
-		System.out.println((LineString.fromLngLats(line)).toJson());
-		
-		var bearingToTarget = Math.round((TurfMeasurement.bearing(drone.dronePos, target.getPoint())/10))*10; // need to dela with east being 0deg
-		System.out.println(bearingToTarget);
-		
-		var nextPos = TurfMeasurement.destination(drone.dronePos, 0.0003, bearingToTarget, TurfConstants.UNIT_DEGREES);
-		System.out.println(nextPos.toJson());
-		
-		List<Point> line2 = new ArrayList<>(Arrays.asList(
-				startPos.getPoint(), nextPos));
-		System.out.println((LineString.fromLngLats(line2)).toJson());
-		
-		drone.dronePos = nextPos;
-		
-		bearingToTarget = Math.round((TurfMeasurement.bearing(drone.dronePos, target.getPoint())/10))*10; // need to dela with east being 0deg
-		System.out.println(bearingToTarget);
-		
-		nextPos = TurfMeasurement.destination(drone.dronePos, 0.0003, bearingToTarget, TurfConstants.UNIT_DEGREES);
-		System.out.println(nextPos.toJson());
-		
-		line2.add(nextPos);
-		System.out.println((LineString.fromLngLats(line2)).toJson());
-		
-		drone.dronePos = nextPos;
-		
-		bearingToTarget = Math.round((TurfMeasurement.bearing(drone.dronePos, target.getPoint())/10))*10; // need to dela with east being 0deg
-		System.out.println(bearingToTarget);
-		
-		nextPos = TurfMeasurement.destination(drone.dronePos, 0.0003, bearingToTarget, TurfConstants.UNIT_DEGREES);
-		System.out.println(nextPos.toJson());
-		
-		line2.add(nextPos);
-		System.out.println((LineString.fromLngLats(line2)).toJson());
-		
-		
-		
-		
-		
+		startPos.validDroneMove(target.getPoint());
 
 		// Start flight path (1 move costs 1 battery power)
-//		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
-//			drone.nextMove();
-//		}
+		for (int i = 0; i < Drone.BATTERY_POWER-115; i++) {
+			drone.nextMove();
+		}
+		System.out.println(">>>> " + (LineString.fromLngLats(drone.line)).toJson());
+		var targetPos = new Coords(map, map.getSensorsCoords()[6][1],
+				map.getSensorsCoords()[6][0]);
+		System.out.println(">>>> " + targetPos.getPoint().toJson());
 
 		drone2.moveToSensors();
+		System.out.println("###########\nTesting going to all sensors and collecting readings:");
 		System.out.println(map.drawPath(drone.getFlightPath()).toJson());
 	}
 }
