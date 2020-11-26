@@ -1,15 +1,9 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
-import com.mapbox.turf.TurfJoins;
-import com.mapbox.turf.TurfMeta;
-import com.mapbox.turf.models.LineIntersectsResult;
 
 public class Coords {
 	private Map map;
@@ -52,8 +46,6 @@ public class Coords {
 		// Proposed move
 		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.getLat(),
 				nextPos.getLng());
-		var line = new ArrayList<>(
-				Arrays.asList(getPoint(), nextPos.getPoint()));
 		
 		// List of buildings
 		String[] buildings = { "Appleton Tower", "David Hume Tower",
@@ -106,6 +98,10 @@ public class Coords {
 			if (crossNoFlyZone) {
 				break;
 			}
+		}
+		
+		if (!crossConfinements && !crossNoFlyZone) {
+			System.out.println(">> Valid move!");
 		}
 
 		return !crossConfinements && !crossNoFlyZone;

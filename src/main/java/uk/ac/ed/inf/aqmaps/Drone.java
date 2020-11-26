@@ -3,26 +3,22 @@ package uk.ac.ed.inf.aqmaps;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 
 public class Drone {
 	public static final int BATTERY_POWER = 150;
 	public static final double MOVE_DIST = 0.0003;
 	private Map map;
-	private Coords dronePos;
+	public Point dronePos;
 	private List<Point> visitedPoss;
 
 	// Constructor
 	public Drone(Map map, Coords startPos) {
 		this.map = map;
-		this.dronePos = startPos;
+		this.dronePos = startPos.getPoint();
 		this.visitedPoss = new ArrayList<Point>();
 		
-		this.visitedPoss.add(this.dronePos.getPoint());
+		this.visitedPoss.add(this.dronePos);
 	}
 	
 	// Getters
@@ -33,7 +29,7 @@ public class Drone {
 	// Methods
 	// Move drone to next position
 	public void nextMove() {
-		var prevPos = this.dronePos;
+		//var prevPos = this.dronePos;
 		
 		// TODO: Move drone
 		// ...
@@ -41,13 +37,13 @@ public class Drone {
 		// TODO: Attempt to collect readings
 		//var targetSensor = new Sensor(targetSensorPos);
 		
-		this.visitedPoss.add(this.dronePos.getPoint());
+		//this.visitedPoss.add(this.dronePos.getPoint());
 	}
 	
 	// Testing path and updating markers
 	public void moveToSensors() {
 		var startPos = this.dronePos;
-		this.visitedPoss.add(this.dronePos.getPoint()); // current pos
+		this.visitedPoss.add(this.dronePos); // current pos
 
 		for (int i = 0; i < Map.SENSORS; i++) {
 			// Add current position to list of visited positions
@@ -68,6 +64,6 @@ public class Drone {
 		}
 
 		// Keep track of drone's path
-		this.visitedPoss.add(startPos.getPoint()); // this is start pos jut to get back there for sake of testing
+		this.visitedPoss.add(startPos); // this is start pos jut to get back there for sake of testing
 	}
 }

@@ -1,6 +1,13 @@
 package uk.ac.ed.inf.aqmaps;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
+import com.mapbox.turf.TurfConstants;
+import com.mapbox.turf.TurfMeasurement;
 
 /**
  * 
@@ -33,10 +40,39 @@ public class App {
 		var map = new Map(parser, yyyy, mm, dd);
 		var startPos = new Coords(map, lat, lng);
 		var drone = new Drone(map, startPos);
-		Drone drone2 = null;
-		Coords nextPos = new Coords(map, 55.9427, -3.1818); // testing valid moves with start postion to first move
-		startPos.validDroneMove(nextPos);
-		drone2 = new Drone(map, startPos);
+		var drone2 = new Drone(map, startPos);
+		Coords target = new Coords(map, 55.9435, -3.1877); // testing valid moves with start postion to first move
+		startPos.validDroneMove(target);
+		
+		//testing
+		drone.dronePos = startPos.getPoint();
+		
+		List<Point> line = new ArrayList<>(Arrays.asList(
+				startPos.getPoint(), target.getPoint()));
+		System.out.println((LineString.fromLngLats(line)).toJson());
+		
+		var bearingToTarget = Math.round((TurfMeasurement.bearing(drone.dronePos, target.getPoint())/10))*10; // need to dela with east being 0deg
+		System.out.println(bearingToTarget);
+		
+		var nextPos = TurfMeasurement.destination(drone.dronePos, 0.0003, bearingToTarget, TurfConstants.UNIT_DEGREES);
+		System.out.println(nextPos.toJson());
+		
+		List<Point> line2 = new ArrayList<>(Arrays.asList(
+				startPos.getPoint(), nextPos));
+		System.out.println((LineString.fromLngLats(line2)).toJson());
+		
+		drone.dronePos = nextPos;
+		
+		bearingToTarget = Math.round((TurfMeasurement.bearing(drone.dronePos, target.getPoint())/10))*10; // need to dela with east being 0deg
+		System.out.println(bearingToTarget);
+		
+		nextPos = TurfMeasurement.destination(drone.dronePos, 0.0003, bearingToTarget, TurfConstants.UNIT_DEGREES);
+		System.out.println(nextPos.toJson());
+		
+		line2.add(nextPos);
+		System.out.println((LineString.fromLngLats(line2)).toJson());
+		
+		
 
 		// Start flight path (1 move costs 1 battery power)
 //		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
