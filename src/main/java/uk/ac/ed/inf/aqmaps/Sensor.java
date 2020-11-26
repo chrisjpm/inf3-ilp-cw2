@@ -20,6 +20,7 @@ public class Sensor {
 		return inRange;
 	}
 	
+	// TODO: move data collection from drone to here
 	public void collectReadings() {
 		
 	}

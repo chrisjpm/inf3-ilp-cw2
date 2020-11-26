@@ -1,29 +1,37 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
+import com.mapbox.turf.TurfClassification;
 import com.mapbox.turf.TurfConstants;
 import com.mapbox.turf.TurfMeasurement;
 
 public class Drone {
 	public static final int BATTERY_POWER = 150;
 	public static final double MOVE_DIST = 0.0003;
+	
+	public boolean flightComplete;
+	public Coords dronePos, endPos;
+	
 	private Map map;
-	public Coords dronePos;
 	private List<Point> visitedPoss;
-	public List<Point> line = new ArrayList<>();
+	private int targetSensorCounter;
+	private int[] route;
+	
 
 	// Constructor
-	public Drone(Map map, Coords startPos) {
+	public Drone(Map map, Coords startPos, Coords endPos) {
 		this.map = map;
 		this.dronePos = startPos;
+		this.endPos = endPos;
+		this.targetSensorCounter = 0;
 		this.visitedPoss = new ArrayList<Point>();
-		
+		this.route = new int[Map.SENSORS];	
 		this.visitedPoss.add(this.dronePos.getPoint());
+		this.flightComplete = false;
+		getRoute();
 	}
 	
 	// Getters
@@ -35,52 +43,95 @@ public class Drone {
 	// Move drone to next position
 	public void nextMove() {
 		var prevPos = this.dronePos;
-		var targetPos = new Coords(this.map, this.map.getSensorsCoords()[6][1],
-				this.map.getSensorsCoords()[6][0]); // closest sensor & not visited
-		
-		// TODO: Move drone		
-		var bearingToTarget = Math.round((TurfMeasurement.bearing(prevPos.getPoint(), targetPos.getPoint())/10))*10; // TODO: convert to E 000 and ACW
-		System.out.println(bearingToTarget);
-		
-		var nextPos = TurfMeasurement.destination(prevPos.getPoint(), 0.0003, bearingToTarget, TurfConstants.UNIT_DEGREES); // TODO: make own destination method
-		System.out.println(nextPos.toJson());
+		var targetIdx = 0;
+		Coords targetPos = null;
 
-		this.line.add(prevPos.getPoint());
+		if(this.targetSensorCounter == 33) {
+			
+			if(endInRange(this.dronePos)) {
+				System.out.println(">>> Flight Complete");
+				this.flightComplete = true;
+				
+				return; 
+			}
+			targetPos = this.endPos;
+		} else {
+			targetIdx = this.route[this.targetSensorCounter];
+			targetPos = new Coords(this.map.getSensorsCoords()[targetIdx][1],
+					this.map.getSensorsCoords()[targetIdx][0]);
+		}
 		
-		prevPos.validDroneMove(nextPos);
-		this.dronePos.setLat(nextPos.latitude());
-		this.dronePos.setLng(nextPos.longitude());
+		var targetSensor = new Sensor(targetPos);
 		
-		// TODO: Attempt to collect readings
-		// ...
+		// Move drone
+		// TODO: own bearings method [MOVEMENT CLASS??]
+		var bearingToTarget = Math.round((TurfMeasurement.bearing(prevPos.getPoint(), targetPos.getPoint())/10))*10; // TODO: convert to E 000 and ACW
+		var moved = false;
 		
-		//this.visitedPoss.add(this.dronePos.getPoint());
+		do {
+			// TODO: own destination method
+			var nextPos = TurfMeasurement.destination(prevPos.getPoint(), MOVE_DIST, bearingToTarget, TurfConstants.UNIT_DEGREES); // TODO: make own destination method
+			
+			if(prevPos.validDroneMove(this.map, nextPos)) {
+				this.dronePos.setLat(nextPos.latitude());
+				this.dronePos.setLng(nextPos.longitude());		
+				moved = true;
+			} else {
+				bearingToTarget = bearingToTarget+10;
+				moved = false;
+			}
+		} while (!moved);		
+		
+		// Attempt to collect readings
+		// TODO: move this from drone to sensor class [MOVEMENT CLASS??]
+		if(targetSensor.sensorInRange(this.dronePos) && this.targetSensorCounter <= 32) {
+			var sensor = this.map.getSensorsFts().get(targetIdx);
+			sensor.addStringProperty("rgb-string",
+					this.map.getMarkerColours().get(targetIdx));
+			sensor.addStringProperty("fill",
+					this.map.getMarkerColours().get(targetIdx));
+			sensor.addStringProperty("marker-color",
+					this.map.getMarkerColours().get(targetIdx));
+			sensor.addStringProperty("marker-symbol",
+					this.map.getMarkerSymbols().get(targetIdx));
+			
+			System.out.println(">>> Sensor read! [" + this.targetSensorCounter + "]");
+			this.targetSensorCounter++;
+		}
+		
+		this.visitedPoss.add(this.dronePos.getPoint());
 	}
 	
-	// Testing path and updating markers
-	public void moveToSensors() {
-		var startPos = this.dronePos.getPoint();
-		this.visitedPoss.add(this.dronePos.getPoint()); // current pos
+	public int[] getRoute() {
+		var route = new ArrayList<Point>();
+		route.addAll(this.map.getSensorsPoints());
+		
+		var routeCopy = new ArrayList<Point>();
+		routeCopy.addAll(this.map.getSensorsPoints());
+		
+		var nextSensor = TurfClassification.nearestPoint(
+				this.dronePos.getPoint(), routeCopy);
+		this.route[0] = routeCopy.indexOf(nextSensor);
+		routeCopy.remove(routeCopy.indexOf(nextSensor));
 
-		for (int i = 0; i < Map.SENSORS; i++) {
-			// Add current position to list of visited positions
-			var nextPos = new Coords(this.map, this.map.getSensorsCoords()[i][1],
-					this.map.getSensorsCoords()[i][0]);
-			this.visitedPoss.add(nextPos.getPoint()); // since this would not actually be a loop, this would be dealt with at the end 
-
-			// Update marker for sensor
-			var sensor = this.map.getSensorsFts().get(i);
-			sensor.addStringProperty("rgb-string",
-					this.map.getMarkerColours().get(i));
-			sensor.addStringProperty("fill",
-					this.map.getMarkerColours().get(i));
-			sensor.addStringProperty("marker-color",
-					this.map.getMarkerColours().get(i));
-			sensor.addStringProperty("marker-symbol",
-					this.map.getMarkerSymbols().get(i));
+		for (int i = 1; i < Map.SENSORS; i++) {
+			
+			nextSensor = TurfClassification.nearestPoint(
+					nextSensor, routeCopy);
+			this.route[i] = route.indexOf(nextSensor);
+			routeCopy.remove(routeCopy.indexOf(nextSensor));
 		}
 
-		// Keep track of drone's path
-		this.visitedPoss.add(startPos); // this is start pos jut to get back there for sake of testing
+		return this.route;
 	}
+	
+	public boolean endInRange(Coords dronePos) {
+		var dronePoint = dronePos.getPoint();
+		var endPoint = this.endPos.getPoint();
+		var inRange = TurfMeasurement.distance(dronePoint, endPoint,
+				TurfConstants.UNIT_DEGREES) <= MOVE_DIST;
+
+		return inRange;
+	}
+	
 }

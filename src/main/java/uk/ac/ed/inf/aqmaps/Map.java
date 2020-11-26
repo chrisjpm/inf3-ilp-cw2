@@ -12,13 +12,16 @@ import com.mapbox.geojson.Point;
 
 public class Map {
 	public static final int SENSORS = 33;
+	
 	private static final double LNG1 = -3.192473;
 	private static final double LNG2 = -3.184319;
 	private static final double LAT1 = 55.946233;
 	private static final double LAT2 = 55.942617;
+	
 	private List<Point> confPoints;
 	private List<Geometry> noFlyZones;
 	private double[][] sensorsCoords;
+	private List<Point> sensorsPoints;
 	private List<Feature> sensorsFts;
 	private List<String> markerColours, markerSymbols;
 
@@ -27,6 +30,7 @@ public class Map {
 		this.confPoints = new ArrayList<Point>();
 		this.noFlyZones = new ArrayList<Geometry>();
 		this.sensorsCoords = new double[SENSORS][2];
+		this.sensorsPoints = new ArrayList<Point>();
 		this.sensorsFts = new ArrayList<Feature>();
 
 		setUpMap(parser, yyyy, mm, dd);
@@ -43,6 +47,10 @@ public class Map {
 
 	public double[][] getSensorsCoords() {
 		return this.sensorsCoords;
+	}
+	
+	public List<Point> getSensorsPoints() {
+		return this.sensorsPoints;
 	}
 
 	public List<String> getMarkerColours() {
@@ -84,11 +92,12 @@ public class Map {
 		var sensorsPoints = new ArrayList<Point>();
 
 		for (int i = 0; i < SENSORS; i++) {
-			// Split the 3 words up and find their coordinates
+			// Split the 3 words up and find their coordinates and points
 			var line = sensorsWords.get(i).split("\\.");
 			parser.readWords(line[0], line[1], line[2]);
 			this.sensorsCoords[i][0] = parser.getWordsLng();
 			this.sensorsCoords[i][1] = parser.getWordsLat();
+			this.sensorsPoints.add(Point.fromLngLat(parser.getWordsLng(), parser.getWordsLat()));
 
 			// Convert sensors to features and add to a list
 			var sensor = Point.fromLngLat(this.sensorsCoords[i][0],
@@ -113,8 +122,8 @@ public class Map {
 	}
 
 	// Draw the flight path
-	public FeatureCollection drawPath(List<Point> dronePos) {
-		var flightLineString = LineString.fromLngLats(dronePos);
+	public FeatureCollection drawFlight(List<Point> dronePoss) {
+		var flightLineString = LineString.fromLngLats(dronePoss);
 		var flightGeo = (Geometry) flightLineString;
 		var flightFt = Feature.fromGeometry(flightGeo);
 

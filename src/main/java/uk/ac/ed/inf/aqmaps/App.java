@@ -1,14 +1,5 @@
 package uk.ac.ed.inf.aqmaps;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.mapbox.geojson.LineString;
-import com.mapbox.geojson.Point;
-import com.mapbox.turf.TurfConstants;
-import com.mapbox.turf.TurfMeasurement;
-
 /**
  * 
  * @author Chris Perceval-Maxwell (s1839592)
@@ -38,23 +29,18 @@ public class App {
 
 		// Create a new flight map and drone
 		var map = new Map(parser, yyyy, mm, dd);
-		var startPos = new Coords(map, lat, lng);
-		var drone = new Drone(map, startPos);
-		var drone2 = new Drone(map, startPos);
-		Coords target = new Coords(map, 55.9435, -3.1877); // testing valid moves with start postion to first move
-		startPos.validDroneMove(target.getPoint());
+		var startPos = new Coords(lat, lng);
+		var endPos = new Coords(lat, lng);
+		var drone = new Drone(map, startPos, endPos);
 
 		// Start flight path (1 move costs 1 battery power)
-		for (int i = 0; i < Drone.BATTERY_POWER-115; i++) {
+		var moves = 0;
+		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 			drone.nextMove();
+			moves = i+1;
+			if(drone.flightComplete) { break; }
 		}
-		System.out.println(">>>> " + (LineString.fromLngLats(drone.line)).toJson());
-		var targetPos = new Coords(map, map.getSensorsCoords()[6][1],
-				map.getSensorsCoords()[6][0]);
-		System.out.println(">>>> " + targetPos.getPoint().toJson());
-
-		drone2.moveToSensors();
-		System.out.println("###########\nTesting going to all sensors and collecting readings:");
-		System.out.println(map.drawPath(drone.getFlightPath()).toJson());
+		System.out.println(">>>> " + map.drawFlight(drone.getFlightPath()).toJson());
+		System.out.println("Completed in " + moves + " moves!");
 	}
 }

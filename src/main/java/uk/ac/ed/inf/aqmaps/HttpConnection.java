@@ -9,6 +9,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 
 public class HttpConnection {
 	private static final HttpClient CLIENT = HttpClient.newHttpClient();
+	
 	private String ip;
 	private String port;
 	private String json;

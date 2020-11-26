@@ -6,13 +6,11 @@ import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 
 public class Coords {
-	private Map map;
 	private double lat;
 	private double lng;
 
 	// Constructor
-	public Coords(Map map, double lat, double lng) {
-		this.map = map;
+	public Coords(double lat, double lng) {
 		this.lat = lat;
 		this.lng = lng;
 	}
@@ -40,18 +38,7 @@ public class Coords {
 	}
 
 	// Methods
-	public Coords nextDronePos(Movement move) {
-		// Calculate the resulting coordinates from moving in the given
-		// direction
-		// double nextLat = this.lat + Drone.MOVE_DIST * move.cos();
-		// double nextLng = this.lng + Drone.MOVE_DIST * move.sin();
-
-		// return new DronePosition(nextLat, nextLng);
-
-		return null;
-	}
-
-	public boolean validDroneMove(Point nextPos) {
+	public boolean validDroneMove(Map map, Point nextPos) {
 		// Proposed move
 		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.latitude(),
 				nextPos.longitude());
@@ -62,7 +49,7 @@ public class Coords {
 
 		// Crossing confinement area border
 		var crossConfinements = false;
-		var confPoints = this.map.getConfPoints();
+		var confPoints = map.getConfPoints();
 
 		for (int i = 0; i < confPoints.size() - 1; i++) { // Fist & last point are the same
 			int j = (i + 1) % confPoints.size();
@@ -85,7 +72,7 @@ public class Coords {
 
 		// Crossing a no-fly-zone border
 		var crossNoFlyZone = false;
-		var noFlyZones = this.map.getNoFlyZones();
+		var noFlyZones = map.getNoFlyZones();
 		for (int i = 0; i < noFlyZones.size(); i++) {
 			var nfzPoly = (Polygon) noFlyZones.get(i);
 			var nfzPoints = nfzPoly.coordinates().get(0);
@@ -98,7 +85,7 @@ public class Coords {
 						nfzPoints.get(k).longitude());
 				if (linePath.intersectsLine(barrier)) {
 					System.out.println(
-							">> Illegal move! Attmpeted to fly through building '"
+							">> Illegal move! Attempted to fly through building '"
 									+ buildings[i] + "'.");
 					crossNoFlyZone = true;
 					break;
