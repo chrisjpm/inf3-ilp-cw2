@@ -12,13 +12,11 @@ public class App {
 
 	// Main
 	public static void main(String[] args) {
-		// Assign args to vars
 		var dd = args[0];
 		var mm = args[1];
 		var yyyy = args[2];
 		var lat = Double.parseDouble(args[3]);
 		var lng = Double.parseDouble(args[4]);
-		// var seed = Integer.parseInt(args[5]);
 		var port = args[6];
 
 		// Set up a connection to our choice of server
@@ -28,19 +26,23 @@ public class App {
 		var parser = new JsonParser(httpConn);
 
 		// Create a new flight map and drone
+		System.out.println("--- CONNECTING TO SERVER ---------------------------------------------------------");
 		var map = new Map(parser, yyyy, mm, dd);
-		var startPos = new Coords(lat, lng);
-		var endPos = new Coords(lat, lng);
+		System.out.println("--- CONNECTION COMPLETE ----------------------------------------------------------\n");
+		var startPos = new Location(lat, lng);
+		var endPos = new Location(lat, lng);
 		var drone = new Drone(map, startPos, endPos);
 
 		// Start flight path (1 move costs 1 battery power)
 		var moves = 0;
+		System.out.println("--- FLIGHT BEGINING --------------------------------------------------------------");
 		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 			drone.nextMove();
 			moves = i+1;
-			if(drone.flightComplete) { break; }
+			if(drone.flightComplete) break;
 		}
-		System.out.println(">>>> " + map.drawFlight(drone.getFlightPath()).toJson());
-		System.out.println("Completed in " + moves + " moves!");
+		System.out.println("--- FLIGHT COMPLETE --------------------------------------------------------------");
+		System.out.println("[Flight ended in " + moves + " moves]");
+		System.out.println("\nFlight Path: " + map.drawFlight(drone.getFlightPath()).toJson());	
 	}
 }

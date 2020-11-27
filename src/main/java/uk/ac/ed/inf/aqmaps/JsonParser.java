@@ -1,10 +1,10 @@
 package uk.ac.ed.inf.aqmaps;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
-import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;

@@ -13,8 +13,8 @@ public class Drone {
 	public static final double MOVE_DIST = 0.0003;
 	
 	public boolean flightComplete;
-	public Coords dronePos, endPos;
 	
+	private Location dronePos, endPos;	
 	private Map map;
 	private List<Point> visitedPoss;
 	private int targetSensorCounter;
@@ -22,7 +22,7 @@ public class Drone {
 	
 
 	// Constructor
-	public Drone(Map map, Coords startPos, Coords endPos) {
+	public Drone(Map map, Location startPos, Location endPos) {
 		this.map = map;
 		this.dronePos = startPos;
 		this.endPos = endPos;
@@ -31,6 +31,8 @@ public class Drone {
 		this.route = new int[Map.SENSORS];	
 		this.visitedPoss.add(this.dronePos.getPoint());
 		this.flightComplete = false;
+		
+		// Initialise drone with a flight route
 		getRoute();
 	}
 	
@@ -43,59 +45,32 @@ public class Drone {
 	// Move drone to next position
 	public void nextMove() {
 		var prevPos = this.dronePos;
+		
+		// Choose a target for the drone
 		var targetIdx = 0;
-		Coords targetPos = null;
+		Location targetPos = null;
 
-		if(this.targetSensorCounter == 33) {
-			
+		if(this.targetSensorCounter == 33) {		
 			if(endInRange(this.dronePos)) {
-				System.out.println(">>> Flight Complete");
-				this.flightComplete = true;
-				
+				this.flightComplete = true;				
 				return; 
 			}
 			targetPos = this.endPos;
 		} else {
 			targetIdx = this.route[this.targetSensorCounter];
-			targetPos = new Coords(this.map.getSensorsCoords()[targetIdx][1],
-					this.map.getSensorsCoords()[targetIdx][0]);
+			targetPos = this.map.getSensorsLocs().get(targetIdx);
 		}
 		
 		var targetSensor = new Sensor(targetPos);
 		
 		// Move drone
-		// TODO: own bearings method [MOVEMENT CLASS??]
-		var bearingToTarget = Math.round((TurfMeasurement.bearing(prevPos.getPoint(), targetPos.getPoint())/10))*10; // TODO: convert to E 000 and ACW
-		var moved = false;
+		var destination = this.dronePos.moveDrone(this.map, prevPos, targetPos);
+		this.dronePos.setLat(destination.latitude());
+		this.dronePos.setLng(destination.longitude());	
 		
-		do {
-			// TODO: own destination method
-			var nextPos = TurfMeasurement.destination(prevPos.getPoint(), MOVE_DIST, bearingToTarget, TurfConstants.UNIT_DEGREES); // TODO: make own destination method
-			
-			if(prevPos.validDroneMove(this.map, nextPos)) {
-				this.dronePos.setLat(nextPos.latitude());
-				this.dronePos.setLng(nextPos.longitude());		
-				moved = true;
-			} else {
-				bearingToTarget = bearingToTarget+10;
-				moved = false;
-			}
-		} while (!moved);		
-		
-		// Attempt to collect readings
-		// TODO: move this from drone to sensor class [MOVEMENT CLASS??]
+		// Attempt to collect readings 
 		if(targetSensor.sensorInRange(this.dronePos) && this.targetSensorCounter <= 32) {
-			var sensor = this.map.getSensorsFts().get(targetIdx);
-			sensor.addStringProperty("rgb-string",
-					this.map.getMarkerColours().get(targetIdx));
-			sensor.addStringProperty("fill",
-					this.map.getMarkerColours().get(targetIdx));
-			sensor.addStringProperty("marker-color",
-					this.map.getMarkerColours().get(targetIdx));
-			sensor.addStringProperty("marker-symbol",
-					this.map.getMarkerSymbols().get(targetIdx));
-			
-			System.out.println(">>> Sensor read! [" + this.targetSensorCounter + "]");
+			targetSensor.collectReadings(this.map, targetPos, targetIdx);
 			this.targetSensorCounter++;
 		}
 		
@@ -115,21 +90,22 @@ public class Drone {
 		routeCopy.remove(routeCopy.indexOf(nextSensor));
 
 		for (int i = 1; i < Map.SENSORS; i++) {
-			
 			nextSensor = TurfClassification.nearestPoint(
 					nextSensor, routeCopy);
 			this.route[i] = route.indexOf(nextSensor);
 			routeCopy.remove(routeCopy.indexOf(nextSensor));
 		}
+		
+		System.out.println("[Route of sensors to visit: " + route +"]");
 
 		return this.route;
 	}
 	
-	public boolean endInRange(Coords dronePos) {
+	public boolean endInRange(Location dronePos) {
 		var dronePoint = dronePos.getPoint();
 		var endPoint = this.endPos.getPoint();
 		var inRange = TurfMeasurement.distance(dronePoint, endPoint,
-				TurfConstants.UNIT_DEGREES) <= MOVE_DIST;
+				TurfConstants.UNIT_DEGREES) < MOVE_DIST;
 
 		return inRange;
 	}
