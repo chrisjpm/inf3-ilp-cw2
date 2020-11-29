@@ -1,8 +1,5 @@
 package uk.ac.ed.inf.aqmaps;
 
-import com.mapbox.turf.TurfConstants;
-import com.mapbox.turf.TurfMeasurement;
-
 public class Sensor {
 	private static final double READ_SENSOR_RANGE = 0.0002;	
 	private Location sensorPos;

@@ -1,5 +1,8 @@
 package uk.ac.ed.inf.aqmaps;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 /**
  * 
  * @author Chris Perceval-Maxwell (s1839592)
@@ -9,6 +12,28 @@ package uk.ac.ed.inf.aqmaps;
 public class App {
 	// Constants
 	private static final String IP = "localhost";
+	
+	static void writeFiles(String flightpath, String readings, String yyyy, String mm, String dd) {		
+		try {
+			FileWriter myWriter = new FileWriter("ilp-results/flightpath-"+mm+"-"+dd+"-"+yyyy+".txt");
+			myWriter.write(flightpath);
+			myWriter.close();
+			System.out.println("Flightpath text file successfully created!");
+		} catch (IOException e) {
+			System.out.println("Fatal error: Readings GeoJson wasn't created.");
+			e.printStackTrace();
+		}
+		
+		try {
+			FileWriter myWriter = new FileWriter("ilp-results/readings-"+mm+"-"+dd+"-"+yyyy+".geojson");
+			myWriter.write(readings);
+			myWriter.close();
+			System.out.println("Readings GeoJson successfully created!");
+		} catch (IOException e) {
+			System.out.println("Fatal error: Readings GeoJson wasn't created.");
+			e.printStackTrace();
+		}
+	}
 
 	// Main
 	public static void main(String[] args) {
@@ -42,7 +67,12 @@ public class App {
 			if(drone.flightComplete) break;
 		}
 		System.out.println("--- FLIGHT COMPLETE --------------------------------------------------------------");
-		System.out.println("[Flight ended in " + moves + " moves]");
-		System.out.println("\nFlight Path: " + map.drawFlight(drone.getFlightPath()).toJson());	
+		System.out.println("[Flight ended in " + moves + " moves]\n");	
+		
+		System.out.println("--- WRITING FILES ----------------------------------------------------------------");
+		var flightpath = map.getFlightPath(drone.getFlightPath());
+		var readings = map.getReadings(drone.getFlightPath());
+		writeFiles(flightpath, readings, yyyy, mm, dd);
+		System.out.println("--- WRITING COMPLETE -------------------------------------------------------------");
 	}
 }

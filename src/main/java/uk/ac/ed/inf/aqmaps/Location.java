@@ -1,13 +1,8 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
-import com.mapbox.turf.TurfConstants;
-import com.mapbox.turf.TurfMeasurement;
 
 public class Location {
 	private double lat;
@@ -43,8 +38,8 @@ public class Location {
 
 	// Methods
 	public Point moveDrone(Map map, Location prevPos, Location targetPos) {
-		var bearingToTarget = Math.round((TurfMeasurement
-				.bearing(prevPos.getPoint(), targetPos.getPoint()) / 10)) * 10;
+		var bearingToTarget = bearing(prevPos, targetPos);
+		
 		var move = false;
 		Point nextPos = null;
 
@@ -53,16 +48,41 @@ public class Location {
 			if (prevPos.validDroneMove(map, nextPos)) {
 				move = true;
 			} else {
-				bearingToTarget-=10;
+				bearingToTarget+=10;
 			}
 		} while (!move);
 
 		return nextPos;
 	}
 	
+	public long bearing(Location prevPos, Location targetPos) {	
+		var deltaLat = targetPos.getLat() - prevPos.getLat();
+        var deltaLng = targetPos.getLng() - prevPos.getLng();
+
+        var bearingToTarget = Math.toDegrees(Math.atan2(deltaLng, deltaLat));
+        if(bearingToTarget < 0) bearingToTarget += 360;
+
+        if (bearingToTarget >= 0 && bearingToTarget < 90) {
+        	bearingToTarget = 90 - bearingToTarget;
+        } else if (bearingToTarget >= 90 && bearingToTarget < 180) {
+        	bearingToTarget = 450 - bearingToTarget;
+        } else if (bearingToTarget >= 180 && bearingToTarget < 270) {
+        	bearingToTarget = 450 - bearingToTarget;
+        } else if (bearingToTarget >= 270 && bearingToTarget < 360) {
+        	bearingToTarget = 450 - bearingToTarget;
+        }
+        
+        System.out.println(bearingToTarget);
+        
+        bearingToTarget = Math.round(bearingToTarget / 10) * 10;
+        if (bearingToTarget == 360) bearingToTarget = 0;
+
+        return Math.round(bearingToTarget / 10) * 10;		
+	}
+	
 	public Point destination(Location prevPos, double bearingToTarget) {
-		var nextPosLng = prevPos.getLng() + Drone.MOVE_DIST * Math.sin(Math.toRadians(bearingToTarget));
-		var nextPosLat = prevPos.getLat() + Drone.MOVE_DIST * Math.cos(Math.toRadians(bearingToTarget));
+		var nextPosLng = prevPos.getLng() + Drone.MOVE_DIST * Math.cos(Math.toRadians(bearingToTarget));
+		var nextPosLat = prevPos.getLat() + Drone.MOVE_DIST * Math.sin(Math.toRadians(bearingToTarget));
 		
 		return Point.fromLngLat(nextPosLng, nextPosLat);
 	}

@@ -122,9 +122,9 @@ public class Map {
 		this.markerSymbols = pollution.getMarkerSymbols();
 
 	}
-
-	// Draw the flight path
-	public FeatureCollection drawFlight(List<Point> dronePoss) {
+	
+	// Create the flightpath
+	public String getFlightPath(List<Point> dronePoss) {
 		var flightLineString = LineString.fromLngLats(dronePoss);
 		var flightGeo = (Geometry) flightLineString;
 		var flightFt = Feature.fromGeometry(flightGeo);
@@ -134,6 +134,20 @@ public class Map {
 		flightList.addAll(getSensorsFts());
 		var flightFtColl = FeatureCollection.fromFeatures(flightList);
 
-		return flightFtColl;
+		return flightFtColl.toJson();
+	}
+
+	// Create the readings GeoJson
+	public String getReadings(List<Point> dronePoss) {
+		var flightLineString = LineString.fromLngLats(dronePoss);
+		var flightGeo = (Geometry) flightLineString;
+		var flightFt = Feature.fromGeometry(flightGeo);
+
+		var flightList = new ArrayList<Feature>();
+		flightList.add(flightFt);
+		flightList.addAll(getSensorsFts());
+		var flightFtColl = FeatureCollection.fromFeatures(flightList);
+
+		return flightFtColl.toJson();
 	}
 }
