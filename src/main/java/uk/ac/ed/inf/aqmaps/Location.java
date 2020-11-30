@@ -44,55 +44,66 @@ public class Location {
 
 	// Methods
 	public Point moveDrone(Map map, Location prevPos, Location targetPos) {
+		var lastValidBearing = this.bearing;
 		this.bearing = bearing(prevPos, targetPos);
 		System.out.println("Bearing: " + this.bearing);
 
 		var move = false;
 		var incrementBearing = true;		
 		Point nextPos = null;
-		var counterPos = 1;
-		var counterNeg = 2;
-		var lastBearing = this.bearing;
+		var counter = 1;
+		
 
 		do {			
 			nextPos = destination(prevPos, this.bearing);
 			if (prevPos.validDroneMove(map, nextPos)) {
 				move = true;
+				lastValidBearing = this.bearing;
 			} else {
 				if(incrementBearing) {
-					this.bearing += 10*counterPos;
+					this.bearing += 10*counter;
 					
 					if (this.bearing < 0) this.bearing += 360;
 					if (this.bearing >= 360) this.bearing -= 360;
 					
-					if (this.bearing - 180 == lastBearing) {
-						this.bearing +=10;		
-						counterPos++;
+					System.out.println(lastValidBearing);
+					System.out.println(this.bearing);
+					
+					if (lastValidBearing - this.bearing == 180|| lastValidBearing + this.bearing == 180) {
+						System.out.println("here");
+						this.bearing +=330;	
+						
+						if (this.bearing < 0) this.bearing += 360;
+						if (this.bearing >= 360) this.bearing -= 360;
+						
+						counter++;
 					}
 					
-					incrementBearing = false;
-					counterPos++;
-					
+					incrementBearing = false;	
 				} else {
-					this.bearing -= 10*counterNeg;
+					this.bearing -= 10*counter;
 									
 					if (this.bearing < 0) this.bearing += 360;
 					if (this.bearing >= 360) this.bearing -= 360;
 					
-					if (this.bearing - 180 == lastBearing) {
-						this.bearing -=10;
-						counterNeg++;
+					System.out.println(lastValidBearing);
+					System.out.println(this.bearing);
+					
+					if (lastValidBearing - this.bearing == 180|| lastValidBearing + this.bearing == 180) {
+						this.bearing -=330;
+						
+						if (this.bearing < 0) this.bearing += 360;
+						if (this.bearing >= 360) this.bearing -= 360;
+						
+						counter++;
 					}
 									
 					incrementBearing = true;
-					counterNeg++;
-					System.out.println("here");
 				}
-				
-				System.out.println(this.bearing);
+				counter++;
+				//System.out.println(this.bearing);
 			}
 			
-			lastBearing = this.bearing;
 		} while (!move);
 
 		return nextPos;

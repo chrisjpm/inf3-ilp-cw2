@@ -92,6 +92,7 @@ public class Drone {
 	
 		this.visitedPoints.add(this.droneLoc.getPoint());
 		this.bearings.add(droneLoc.getBearing());
+		System.out.println(droneLoc.getBearing());
 	}
 
 	public int[] getRoute() {
