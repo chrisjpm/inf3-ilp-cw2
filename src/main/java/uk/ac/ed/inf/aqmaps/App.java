@@ -72,7 +72,7 @@ public class App {
 				"--- FLIGHT BEGINING --------------------------------------------------------------");
 		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 			drone.nextMove();
-			moves = i;
+			moves = i + 1;
 			if (drone.flightComplete)
 				break;
 		}

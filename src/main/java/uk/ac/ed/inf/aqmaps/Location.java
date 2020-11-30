@@ -48,15 +48,51 @@ public class Location {
 		System.out.println("Bearing: " + this.bearing);
 
 		var move = false;
+		var incrementBearing = true;		
 		Point nextPos = null;
+		var counterPos = 1;
+		var counterNeg = 2;
+		var lastBearing = this.bearing;
 
-		do {
+		do {			
 			nextPos = destination(prevPos, this.bearing);
 			if (prevPos.validDroneMove(map, nextPos)) {
 				move = true;
 			} else {
-				this.bearing -= 10;
+				if(incrementBearing) {
+					this.bearing += 10*counterPos;
+					
+					if (this.bearing < 0) this.bearing += 360;
+					if (this.bearing >= 360) this.bearing -= 360;
+					
+					if (this.bearing - 180 == lastBearing) {
+						this.bearing +=10;		
+						counterPos++;
+					}
+					
+					incrementBearing = false;
+					counterPos++;
+					
+				} else {
+					this.bearing -= 10*counterNeg;
+									
+					if (this.bearing < 0) this.bearing += 360;
+					if (this.bearing >= 360) this.bearing -= 360;
+					
+					if (this.bearing - 180 == lastBearing) {
+						this.bearing -=10;
+						counterNeg++;
+					}
+									
+					incrementBearing = true;
+					counterNeg++;
+					System.out.println("here");
+				}
+				
+				System.out.println(this.bearing);
 			}
+			
+			lastBearing = this.bearing;
 		} while (!move);
 
 		return nextPos;
