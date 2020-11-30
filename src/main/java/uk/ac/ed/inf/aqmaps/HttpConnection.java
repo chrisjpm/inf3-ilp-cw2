@@ -9,7 +9,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 
 public class HttpConnection {
 	private static final HttpClient CLIENT = HttpClient.newHttpClient();
-	
+
 	private String ip;
 	private String port;
 	private String json;
@@ -41,14 +41,13 @@ public class HttpConnection {
 	// Connect to the server and access the desired file
 	public void connToUrl(String urlString) {
 		// HttpClient assumes that it is a GET request by default.
-		var request = HttpRequest.newBuilder()
-				.uri(URI.create(urlString))
+		var request = HttpRequest.newBuilder().uri(URI.create(urlString))
 				.build();
 
 		// Return the GeoJson content if response code is 200, i.e. a valid
 		// urlString. Else, return nothing.
 		// Try and connect to the URI, catch if it cannot.
-		
+
 		try {
 			var response = CLIENT.send(request, BodyHandlers.ofString());
 			System.out.println("Valid URI!");

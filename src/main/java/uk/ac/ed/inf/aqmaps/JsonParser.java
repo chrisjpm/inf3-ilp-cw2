@@ -16,7 +16,7 @@ public class JsonParser {
 	private List<Double> sensorsBattery;
 	private List<String> sensorsReading;
 	private double wordsLng;
-	private double wordsLat;	
+	private double wordsLat;
 
 	// Constructor
 	public JsonParser(HttpConnection conn) {
@@ -34,11 +34,11 @@ public class JsonParser {
 	public List<String> getSensorWords() {
 		return this.sensorsWords;
 	}
-	
+
 	public List<Double> getSensorBatteries() {
 		return this.sensorsBattery;
 	}
-	
+
 	public List<String> getSensorReadings() {
 		return this.sensorsReading;
 	}
@@ -56,20 +56,21 @@ public class JsonParser {
 	public void readBuildings() {
 		conn.connToUrl(conn.getServer() + "/buildings/no-fly-zones.geojson");
 
-		this.buildings = FeatureCollection.fromJson(conn.getJson()).features();	
+		this.buildings = FeatureCollection.fromJson(conn.getJson()).features();
 	}
 
 	// Parse maps, i.e. the air-quality-data
 	public void readMaps(String yyyy, String mm, String dd) {
 		conn.connToUrl(conn.getServer() + "/maps/" + yyyy + "/" + mm + "/" + dd
 				+ "/air-quality-data.json");
-		
-		Type listType = new TypeToken<ArrayList<AirQualityData>>() {}.getType();
+
+		Type listType = new TypeToken<ArrayList<AirQualityData>>() {
+		}.getType();
 		ArrayList<AirQualityData> aqData = new Gson().fromJson(conn.getJson(),
 				listType);
 
 		for (int i = 0; i < aqData.size(); i++) {
-			this.sensorsWords.add(aqData.get(i).location);			
+			this.sensorsWords.add(aqData.get(i).location);
 			this.sensorsBattery.add(aqData.get(i).battery);
 			this.sensorsReading.add(aqData.get(i).reading);
 		}
@@ -79,7 +80,7 @@ public class JsonParser {
 	public void readWords(String w1, String w2, String w3) {
 		conn.connToUrl(conn.getServer() + "/words/" + w1 + "/" + w2 + "/" + w3
 				+ "/details.json");
-		
+
 		var sensorCoords = new Gson().fromJson(conn.getJson(), Details.class);
 
 		// Set coords of the sensors

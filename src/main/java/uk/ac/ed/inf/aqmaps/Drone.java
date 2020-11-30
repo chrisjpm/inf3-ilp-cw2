@@ -11,103 +11,119 @@ import com.mapbox.turf.TurfMeasurement;
 public class Drone {
 	public static final int BATTERY_POWER = 150;
 	public static final double MOVE_DIST = 0.0003;
-	
+
 	public boolean flightComplete;
-	
-	private Location dronePos, endPos;	
+
+	private Location droneLoc;
+	private final Location endLoc;
 	private Map map;
-	private List<Point> visitedPoss;
+	private List<Point> visitedPoints;
 	private int targetSensorCounter;
 	private int[] route;
-	
+	private List<Long> bearings;
+	private List<String> sensorsReadWords;
 
 	// Constructor
-	public Drone(Map map, Location startPos, Location endPos) {
+	public Drone(Map map, Point startLoc) {
 		this.map = map;
-		this.dronePos = startPos;
-		this.endPos = endPos;
+		this.endLoc = new Location(startLoc.latitude(), startLoc.longitude());
+		this.droneLoc = new Location(startLoc.latitude(), startLoc.longitude());
 		this.targetSensorCounter = 0;
-		this.visitedPoss = new ArrayList<Point>();
+		this.visitedPoints = new ArrayList<Point>();
 		this.route = new int[Map.SENSORS];	
-		this.visitedPoss.add(this.dronePos.getPoint());
-		this.flightComplete = false;
-		
+		this.bearings = new ArrayList<Long>();
+		this.sensorsReadWords = new ArrayList<String>();
+
 		// Initialise drone with a flight route
+		this.visitedPoints.add(this.droneLoc.getPoint());
+		this.flightComplete = false;
 		getRoute();
 	}
-	
+
 	// Getters
 	public List<Point> getFlightPath() {
-		return this.visitedPoss;
+		return this.visitedPoints;
 	}
+	
+	public List<Long> getBearings() {
+		return this.bearings;
+	}
+	
+	public List<String> getSensorsReadWords() {
+		return this.sensorsReadWords;
+	}
+
 
 	// Methods
 	// Move drone to next position
 	public void nextMove() {
-		var prevPos = this.dronePos;
-		
 		// Choose a target for the drone
 		var targetIdx = 0;
-		Location targetPos = null;
+		Location targetLoc = null;
 
-		if(this.targetSensorCounter == 33) {		
-			if(endInRange(this.dronePos)) {
-				this.flightComplete = true;				
-				return; 
+		if (this.targetSensorCounter == 33) {
+			if (endInRange(this.droneLoc)) {
+				this.flightComplete = true;
+				return;
 			}
-			targetPos = this.endPos;
+			targetLoc = this.endLoc;
 		} else {
 			targetIdx = this.route[this.targetSensorCounter];
-			targetPos = this.map.getSensorsLocs().get(targetIdx);
+			targetLoc = this.map.getSensorsLocs().get(targetIdx);
 		}
-		
-		var targetSensor = new Sensor(targetPos);
-		
+
+		var targetSensor = new Sensor(targetLoc);
+
 		// Move drone
-		var destination = this.dronePos.moveDrone(this.map, prevPos, targetPos);
-		this.dronePos.setLat(destination.latitude());
-		this.dronePos.setLng(destination.longitude());	
-		
-		// Attempt to collect readings 
-		if(targetSensor.sensorInRange(this.dronePos) && this.targetSensorCounter <= 32) {
-			targetSensor.collectReadings(this.map, targetPos, targetIdx);
+		var destination = this.droneLoc.moveDrone(this.map, this.droneLoc,
+				targetLoc);
+		this.droneLoc.setLat(destination.latitude());
+		this.droneLoc.setLng(destination.longitude());
+
+		// Attempt to collect readings
+		if (targetSensor.sensorInRange(this.droneLoc)
+				&& this.targetSensorCounter <= 32) {
+			targetSensor.collectReadings(this.map, targetIdx);
+			this.sensorsReadWords.add(this.map.getSensorsWords().get(targetIdx));
 			this.targetSensorCounter++;
+		} else {
+			this.sensorsReadWords.add(null);
 		}
-		
-		this.visitedPoss.add(this.dronePos.getPoint());
-	}
 	
+		this.visitedPoints.add(this.droneLoc.getPoint());
+		this.bearings.add(droneLoc.getBearing());
+	}
+
 	public int[] getRoute() {
 		var route = new ArrayList<Point>();
 		route.addAll(this.map.getSensorsPoints());
-		
+
 		var routeCopy = new ArrayList<Point>();
 		routeCopy.addAll(this.map.getSensorsPoints());
-		
-		var nextSensor = TurfClassification.nearestPoint(
-				this.dronePos.getPoint(), routeCopy);
+
+		var nextSensor = TurfClassification
+				.nearestPoint(this.droneLoc.getPoint(), routeCopy);
 		this.route[0] = routeCopy.indexOf(nextSensor);
 		routeCopy.remove(routeCopy.indexOf(nextSensor));
 
 		for (int i = 1; i < Map.SENSORS; i++) {
-			nextSensor = TurfClassification.nearestPoint(
-					nextSensor, routeCopy);
+			nextSensor = TurfClassification.nearestPoint(nextSensor, routeCopy);
 			this.route[i] = route.indexOf(nextSensor);
 			routeCopy.remove(routeCopy.indexOf(nextSensor));
 		}
-		
-		System.out.println("[Route of sensors to visit: " + route +"]");
+
+		System.out.println("[Route of sensors to visit: " + route + "]");
 
 		return this.route;
 	}
-	
-	public boolean endInRange(Location dronePos) {
-		var dronePoint = dronePos.getPoint();
-		var endPoint = this.endPos.getPoint();
+
+	public boolean endInRange(Location droneLoc) {
+		var dronePoint = droneLoc.getPoint();
+		var endPoint = this.endLoc.getPoint();
 		var inRange = TurfMeasurement.distance(dronePoint, endPoint,
 				TurfConstants.UNIT_DEGREES) < MOVE_DIST;
 
 		return inRange;
 	}
-	
+
 }

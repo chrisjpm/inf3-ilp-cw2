@@ -1,12 +1,14 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.awt.geom.Line2D;
+
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 
 public class Location {
 	private double lat;
 	private double lng;
+	private Long bearing;
 
 	// Constructor
 	public Location(double lat, double lng) {
@@ -22,9 +24,13 @@ public class Location {
 	public double getLng() {
 		return this.lng;
 	}
-	
+
 	public Point getPoint() {
 		return Point.fromLngLat(this.lng, this.lat);
+	}
+	
+	public Long getBearing() {
+		return this.bearing;
 	}
 
 	// Setters
@@ -38,52 +44,55 @@ public class Location {
 
 	// Methods
 	public Point moveDrone(Map map, Location prevPos, Location targetPos) {
-		var bearingToTarget = bearing(prevPos, targetPos);
-		
+		this.bearing = bearing(prevPos, targetPos);
+		System.out.println("Bearing: " + this.bearing);
+
 		var move = false;
 		Point nextPos = null;
 
-		do {		
-			nextPos = destination(prevPos, bearingToTarget);
+		do {
+			nextPos = destination(prevPos, this.bearing);
 			if (prevPos.validDroneMove(map, nextPos)) {
 				move = true;
 			} else {
-				bearingToTarget+=10;
+				this.bearing -= 10;
 			}
 		} while (!move);
 
 		return nextPos;
 	}
-	
-	public long bearing(Location prevPos, Location targetPos) {	
+
+	public long bearing(Location prevPos, Location targetPos) {
 		var deltaLat = targetPos.getLat() - prevPos.getLat();
-        var deltaLng = targetPos.getLng() - prevPos.getLng();
+		var deltaLng = targetPos.getLng() - prevPos.getLng();
 
-        var bearingToTarget = Math.toDegrees(Math.atan2(deltaLng, deltaLat));
-        if(bearingToTarget < 0) bearingToTarget += 360;
+		var bearingToTarget = Math.toDegrees(Math.atan2(deltaLng, deltaLat));
+		if (bearingToTarget < 0)
+			bearingToTarget += 360;
 
-        if (bearingToTarget >= 0 && bearingToTarget < 90) {
-        	bearingToTarget = 90 - bearingToTarget;
-        } else if (bearingToTarget >= 90 && bearingToTarget < 180) {
-        	bearingToTarget = 450 - bearingToTarget;
-        } else if (bearingToTarget >= 180 && bearingToTarget < 270) {
-        	bearingToTarget = 450 - bearingToTarget;
-        } else if (bearingToTarget >= 270 && bearingToTarget < 360) {
-        	bearingToTarget = 450 - bearingToTarget;
-        }
-        
-        System.out.println(bearingToTarget);
-        
-        bearingToTarget = Math.round(bearingToTarget / 10) * 10;
-        if (bearingToTarget == 360) bearingToTarget = 0;
+		if (bearingToTarget >= 0 && bearingToTarget < 90) {
+			bearingToTarget = 90 - bearingToTarget;
+		} else if (bearingToTarget >= 90 && bearingToTarget < 180) {
+			bearingToTarget = 450 - bearingToTarget;
+		} else if (bearingToTarget >= 180 && bearingToTarget < 270) {
+			bearingToTarget = 450 - bearingToTarget;
+		} else if (bearingToTarget >= 270 && bearingToTarget < 360) {
+			bearingToTarget = 450 - bearingToTarget;
+		}
 
-        return Math.round(bearingToTarget / 10) * 10;		
+		bearingToTarget = Math.round(bearingToTarget / 10) * 10;
+		if (bearingToTarget == 360)
+			bearingToTarget = 0;
+
+		return Math.round(bearingToTarget / 10) * 10;
 	}
-	
+
 	public Point destination(Location prevPos, double bearingToTarget) {
-		var nextPosLng = prevPos.getLng() + Drone.MOVE_DIST * Math.cos(Math.toRadians(bearingToTarget));
-		var nextPosLat = prevPos.getLat() + Drone.MOVE_DIST * Math.sin(Math.toRadians(bearingToTarget));
-		
+		var nextPosLng = prevPos.getLng()
+				+ Drone.MOVE_DIST * Math.cos(Math.toRadians(bearingToTarget));
+		var nextPosLat = prevPos.getLat()
+				+ Drone.MOVE_DIST * Math.sin(Math.toRadians(bearingToTarget));
+
 		return Point.fromLngLat(nextPosLng, nextPosLat);
 	}
 
@@ -148,7 +157,7 @@ public class Location {
 				break;
 			}
 		}
-		
+
 		var validMove = !crossConfinements && !crossNoFlyZone;
 
 		if (validMove) {

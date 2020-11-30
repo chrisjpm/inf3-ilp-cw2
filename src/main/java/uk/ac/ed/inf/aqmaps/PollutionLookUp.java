@@ -25,18 +25,18 @@ public class PollutionLookUp {
 	// Methods
 	public void lookUp(List<Double> batteries, List<String> readings) {
 		for (var i = 0; i < Map.SENSORS; i++) {
-			if (readings.get(i) == "null" || readings.get(i) == "NaN"){
+			if (readings.get(i) == "null" || readings.get(i) == "NaN") {
 				this.markerColour.add("#000000");
 				this.markerSymbol.add("cross");
 				continue;
 			}
-			
+
 			if (batteries.get(i) < 10) {
 				this.markerColour.add("#000000");
 				this.markerSymbol.add("cross");
 				continue;
 			}
-			
+
 			if (Double.parseDouble(readings.get(i)) >= 0
 					&& Double.parseDouble(readings.get(i)) < 32) {
 				this.markerColour.add("#00ff00");

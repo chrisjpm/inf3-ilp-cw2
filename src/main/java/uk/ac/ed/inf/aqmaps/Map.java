@@ -20,10 +20,11 @@ public class Map {
 
 	private List<Point> confPoints;
 	private List<Geometry> noFlyZones;
+	private List<String> sensorsWords;
 	private List<Location> sensorsLocs;
 	private List<Point> sensorsPoints;
 	private List<Feature> sensorsFts;
-	private List<String> markerColours, markerSymbols;
+	private List<String> markerColours, markerSymbols;	
 
 	// Constructor
 	public Map(JsonParser parser, String yyyy, String mm, String dd) {
@@ -43,6 +44,10 @@ public class Map {
 
 	public List<Geometry> getNoFlyZones() {
 		return this.noFlyZones;
+	}
+	
+	public List<String> getSensorsWords() {
+		return this.sensorsWords;
 	}
 
 	public List<Location> getSensorsLocs() {
@@ -86,9 +91,7 @@ public class Map {
 		parser.readMaps(yyyy, mm, dd);
 		var sensorsBattery = parser.getSensorBatteries();
 		var sensorsReading = parser.getSensorReadings();
-
-		var sensorsWords = parser.getSensorWords();
-		var sensorsPoints = new ArrayList<Point>();
+		this.sensorsWords = parser.getSensorWords();
 
 		for (int i = 0; i < SENSORS; i++) {
 			// Split the 3 words up and find their coordinates and points
@@ -98,14 +101,13 @@ public class Map {
 			var sensorLoc = new Location(parser.getWordsLat(),
 					parser.getWordsLng());
 			this.sensorsLocs.add(sensorLoc);
+			var sensorPoint = Point.fromLngLat(parser.getWordsLng(),
+					parser.getWordsLat());
 			this.sensorsPoints.add(Point.fromLngLat(parser.getWordsLng(),
 					parser.getWordsLat()));
 
 			// Convert sensors to features and add to a list
-			var sensor = Point.fromLngLat(sensorLoc.getLng(),
-					sensorLoc.getLat());
-			sensorsPoints.add(sensor);
-			var sensorGeo = (Geometry) sensor;
+			var sensorGeo = (Geometry) sensorPoint;
 			var sensorFt = Feature.fromGeometry(sensorGeo);
 
 			// Set up marker as not visited by default
@@ -122,24 +124,24 @@ public class Map {
 		this.markerSymbols = pollution.getMarkerSymbols();
 
 	}
-	
+
 	// Create the flightpath
-	public String getFlightPath(List<Point> dronePoss) {
-		var flightLineString = LineString.fromLngLats(dronePoss);
-		var flightGeo = (Geometry) flightLineString;
-		var flightFt = Feature.fromGeometry(flightGeo);
+	public String[] getFlightPath(List<Point> dronePoints, List<Long> bearings, List<String> words) {
+		String[] lines = new String[dronePoints.size()];
 
-		var flightList = new ArrayList<Feature>();
-		flightList.add(flightFt);
-		flightList.addAll(getSensorsFts());
-		var flightFtColl = FeatureCollection.fromFeatures(flightList);
+		for (int i = 0; i < dronePoints.size()-1; i++) { // Last point isn't a move
+			lines[i] = i+1 + "," + dronePoints.get(i).latitude() + ","
+					+ dronePoints.get(i).longitude() + "," + bearings.get(i) + ","
+					+ dronePoints.get(i + 1).latitude() + ","
+					+ dronePoints.get(i + 1).longitude() + "," + words.get(i);
+		}
 
-		return flightFtColl.toJson();
+		return lines;
 	}
 
 	// Create the readings GeoJson
-	public String getReadings(List<Point> dronePoss) {
-		var flightLineString = LineString.fromLngLats(dronePoss);
+	public String getReadings(List<Point> dronePoints) {
+		var flightLineString = LineString.fromLngLats(dronePoints);
 		var flightGeo = (Geometry) flightLineString;
 		var flightFt = Feature.fromGeometry(flightGeo);
 
