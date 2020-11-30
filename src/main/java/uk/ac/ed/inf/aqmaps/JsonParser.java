@@ -9,7 +9,15 @@ import com.google.gson.reflect.TypeToken;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 
+/**
+ * Class to parse the JSON files that contain the map details
+ * 
+ * @author Chris
+ *
+ */
+
 public class JsonParser {
+	// Private variables
 	private HttpConnection conn;
 	private List<Feature> buildings;
 	private List<String> sensorsWords;
@@ -18,7 +26,11 @@ public class JsonParser {
 	private double wordsLng;
 	private double wordsLat;
 
-	// Constructor
+	/**
+	 * JsonParser constructor
+	 * 
+	 * @param conn - The server to connect to
+	 */
 	public JsonParser(HttpConnection conn) {
 		this.conn = conn;
 		this.sensorsWords = new ArrayList<String>();
@@ -52,18 +64,28 @@ public class JsonParser {
 	}
 
 	// Methods
-	// Parse buildings, i.e. the no-fly-zones
+	/**
+	 * Parse buildings, i.e. the no-fly-zones
+	 */
 	public void readBuildings() {
 		conn.connToUrl(conn.getServer() + "/buildings/no-fly-zones.geojson");
 
 		this.buildings = FeatureCollection.fromJson(conn.getJson()).features();
 	}
 
-	// Parse maps, i.e. the air-quality-data
+	/**
+	 * Parse maps, i.e. the air-quality-data
+	 * 
+	 * @param yyyy - year of flight
+	 * @param mm   - month of flight
+	 * @param dd   - day of flight
+	 */
 	public void readMaps(String yyyy, String mm, String dd) {
+		// Get air quality data details of given flight date
 		conn.connToUrl(conn.getServer() + "/maps/" + yyyy + "/" + mm + "/" + dd
 				+ "/air-quality-data.json");
 
+		// Assign to AirQuality Class
 		Type listType = new TypeToken<ArrayList<AirQualityData>>() {
 		}.getType();
 		ArrayList<AirQualityData> aqData = new Gson().fromJson(conn.getJson(),
@@ -76,11 +98,19 @@ public class JsonParser {
 		}
 	}
 
-	// Parse words, i.e. an area on the map
+	/**
+	 * Parse words, i.e. an area on the map, from what3words location
+	 * 
+	 * @param w1 - Word 1
+	 * @param w2 - Word 2
+	 * @param w3 - Word 3
+	 */
 	public void readWords(String w1, String w2, String w3) {
+		// Get location from given words
 		conn.connToUrl(conn.getServer() + "/words/" + w1 + "/" + w2 + "/" + w3
 				+ "/details.json");
 
+		// Assign to Details class
 		var sensorCoords = new Gson().fromJson(conn.getJson(), Details.class);
 
 		// Set coords of the sensors

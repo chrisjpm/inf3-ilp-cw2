@@ -3,11 +3,21 @@ package uk.ac.ed.inf.aqmaps;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to assign colours and markers to air quality
+ * 
+ * @author Chris
+ *
+ */
+
 public class PollutionLookUp {
+	// Private variables
 	private List<String> markerColour;
 	private List<String> markerSymbol;
 
-	// Constructor
+	/**
+	 * PollutionLookUp constructor
+	 */
 	public PollutionLookUp() {
 		this.markerColour = new ArrayList<String>();
 		this.markerSymbol = new ArrayList<String>();
@@ -23,20 +33,31 @@ public class PollutionLookUp {
 	}
 
 	// Methods
+	/**
+	 * Assign colours and markers to air quality
+	 * 
+	 * @param batteries - The battery values for all the sensors
+	 * @param readings  - The air quality reading for each sensor
+	 */
 	public void lookUp(List<Double> batteries, List<String> readings) {
 		for (var i = 0; i < Map.SENSORS; i++) {
+			// If there was no reading taken, assign the colour black and a
+			// cross and continue to next list item
 			if (readings.get(i) == "null" || readings.get(i) == "NaN") {
 				this.markerColour.add("#000000");
 				this.markerSymbol.add("cross");
 				continue;
 			}
 
+			// If the battery was below 10%, assign black and a cross and
+			// continue to next list item
 			if (batteries.get(i) < 10) {
 				this.markerColour.add("#000000");
 				this.markerSymbol.add("cross");
 				continue;
 			}
 
+			// Take the valid reading and assign its colour and symbol 
 			if (Double.parseDouble(readings.get(i)) >= 0
 					&& Double.parseDouble(readings.get(i)) < 32) {
 				this.markerColour.add("#00ff00");

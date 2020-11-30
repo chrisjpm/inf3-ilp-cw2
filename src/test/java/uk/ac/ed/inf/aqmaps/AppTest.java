@@ -9,8 +9,10 @@ import org.junit.Test;
  */
 public class AppTest {
 	/**
-	 * Rigorous Test :-)
+	 * Various tests on the drone system
 	 */
+	
+	// Make sure all dates create files
 	@Test
 	public void testReadings() {
 		var yyyy = "2020";

@@ -1,16 +1,36 @@
 package uk.ac.ed.inf.aqmaps;
 
-public class Sensor {
-	private static final double READ_SENSOR_RANGE = 0.0002;
-	private Location sensorPos;
+/**
+ * Class to control sensors
+ * 
+ * @author Chris
+ *
+ */
 
-	public Sensor(Location targetPos) {
-		this.sensorPos = targetPos;
+public class Sensor {
+	// Private constants and variables
+	private static final double READ_SENSOR_RANGE = 0.0002;
+	private Location sensorLoc;
+
+	/**
+	 * Sensor constructor
+	 * 
+	 * @param targetLoc - Location of the target sensor
+	 */
+	public Sensor(Location sensorLoc) {
+		this.sensorLoc = sensorLoc;
 	}
 
-	public boolean sensorInRange(Location dronePos) {
-		var dronePoint = dronePos.getPoint();
-		var sensorPoint = this.sensorPos.getPoint();
+	/**
+	 * Determine if drone can take reading off sensor
+	 * 
+	 * @param droneLoc - Location of the drone
+	 * @return Truth value of the drone's Location is within range of the target
+	 *         Sensor
+	 */
+	public boolean sensorInRange(Location droneLoc) {
+		var dronePoint = droneLoc.getPoint();
+		var sensorPoint = this.sensorLoc.getPoint();
 		var dist = Math.sqrt(Math
 				.pow((sensorPoint.longitude() - dronePoint.longitude()), 2)
 				+ Math.pow((sensorPoint.latitude() - dronePoint.latitude()),
@@ -20,7 +40,14 @@ public class Sensor {
 		return inRange;
 	}
 
+	/**
+	 * Collect the drones readings if within range
+	 * 
+	 * @param map       - The map the drone is navigating
+	 * @param targetIdx - Index value of the target sensor in the original list
+	 */
 	public void collectReadings(Map map, int targetIdx) {
+		// Take sensor's data and look up what colour and marker to assign
 		var sensor = map.getSensorsFts().get(targetIdx);
 		sensor.addStringProperty("rgb-string",
 				map.getMarkerColours().get(targetIdx));

@@ -1,11 +1,20 @@
 package uk.ac.ed.inf.aqmaps;
 
+/**
+ * JSON structure for location of sensors
+ * 
+ * @author Chris
+ *
+ */
+
 public class Details {
 	String country;
 
 	Sqaure square;
+
 	public class Sqaure {
 		Southwest southwest;
+
 		public class Southwest {
 			double lng;
 			double lat;
@@ -17,6 +26,7 @@ public class Details {
 		}
 
 		NorthWest northwest;
+
 		public class NorthWest {
 			double lng;
 			double lat;
@@ -37,6 +47,7 @@ public class Details {
 	String nearestPlace;
 
 	Coordinates coordinates;
+
 	public class Coordinates {
 		double lng;
 		double lat;
