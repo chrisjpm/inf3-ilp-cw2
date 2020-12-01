@@ -113,7 +113,7 @@ public class JsonParser {
 				+ "/details.json");
 
 		// Assign to Details class
-		var sensorCoords = new Gson().fromJson(conn.getJson(), Details.class);
+		var sensorCoords = new Gson().fromJson(conn.getJson(), LocationDetails.class);
 
 		// Set coords of the sensors
 		this.wordsLng = sensorCoords.coordinates.lng;

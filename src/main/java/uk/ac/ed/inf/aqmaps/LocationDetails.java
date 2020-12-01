@@ -7,7 +7,7 @@ package uk.ac.ed.inf.aqmaps;
  *
  */
 
-public class Details {
+public class LocationDetails {
 	String country;
 
 	Sqaure square;
