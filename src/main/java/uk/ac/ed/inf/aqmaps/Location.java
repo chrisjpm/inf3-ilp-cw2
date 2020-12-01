@@ -90,11 +90,11 @@ public class Location {
 					// Ensure valid bearing
 					this.bearing = validBearing(this.bearing);
 
-					// If the drone is about to go back on it self, make a
-					// significant change to the bearing
+					// If the drone is about to go back on it self, adjust
+					// bearing again but in the opposite direction
 					if (lastValidBearing - this.bearing == 180
-							|| lastValidBearing + this.bearing == 180) {
-						this.bearing += 20;
+							|| this.bearing - lastValidBearing == 180) {
+						this.bearing -= 20;
 						this.bearing = validBearing(this.bearing);
 						counter++;
 					}
@@ -104,8 +104,8 @@ public class Location {
 					this.bearing = validBearing(this.bearing);
 
 					if (lastValidBearing - this.bearing == 180
-							|| lastValidBearing + this.bearing == 180) {
-						this.bearing -= 20;
+							|| this.bearing - lastValidBearing == 180) {
+						this.bearing += 20;
 						this.bearing = validBearing(this.bearing);
 						counter++;
 					}
@@ -131,7 +131,8 @@ public class Location {
 		var deltaLng = targetPos.getLng() - prevPos.getLng();
 
 		// Find bearing and ensure its validity
-		var bearingToTarget = (int) Math.toDegrees(Math.atan2(deltaLng, deltaLat));
+		var bearingToTarget = (int) Math
+				.toDegrees(Math.atan2(deltaLng, deltaLat));
 		bearingToTarget = validBearing(bearingToTarget);
 
 		if (bearingToTarget >= 0 && bearingToTarget < 90) {

@@ -67,7 +67,6 @@ public class HttpConnection {
 		// urlString. Else, return nothing.
 		// Try and connect to the URI, catch if it cannot.
 
-
 		try {
 			var response = CLIENT.send(request, BodyHandlers.ofString());
 
@@ -75,8 +74,8 @@ public class HttpConnection {
 			if (response.statusCode() == 200) {
 				this.json = response.body();
 			} else {
-				System.out.println(
-						"Fatal error: Response code: " + response.statusCode());
+				System.out.println("Fatal error: Response code: "
+						+ response.statusCode() + " for '" + urlString + "'");
 				System.exit(1); // Exit the application
 			}
 		} catch (IOException | InterruptedException e) {

@@ -164,8 +164,8 @@ public class Map {
 		// Add each move to a new entry in the array
 		// Loop the size -1 since the last point is the destination, not a move
 		for (int i = 0; i < dronePoints.size() - 1; i++) {
-			lines[i] = (i + 1) + "," + dronePoints.get(i).latitude() + ","
-					+ dronePoints.get(i).longitude() + "," + bearings.get(i)
+			lines[i] = (i + 1) + "," + dronePoints.get(i).longitude() + ","
+					+ dronePoints.get(i).latitude() + "," + bearings.get(i)
 					+ "," + dronePoints.get(i + 1).longitude() + ","
 					+ dronePoints.get(i + 1).latitude() + "," + words.get(i);
 		}
