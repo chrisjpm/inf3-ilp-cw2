@@ -68,7 +68,8 @@ public class JsonParser {
 	 * Parse buildings, i.e. the no-fly-zones
 	 */
 	public void readBuildings() {
-		conn.connToUrl(conn.getServer() + "/buildings/no-fly-zones.geojson");
+		this.conn.connToUrl(conn.getServer() + "/buildings/no-fly-zones.geojson");
+		System.out.println("No-Fly Zones fetched!");
 
 		this.buildings = FeatureCollection.fromJson(conn.getJson()).features();
 	}
@@ -82,8 +83,9 @@ public class JsonParser {
 	 */
 	public void readMaps(String yyyy, String mm, String dd) {
 		// Get air quality data details of given flight date
-		conn.connToUrl(conn.getServer() + "/maps/" + yyyy + "/" + mm + "/" + dd
+		this.conn.connToUrl(conn.getServer() + "/maps/" + yyyy + "/" + mm + "/" + dd
 				+ "/air-quality-data.json");
+		System.out.println("Air Quality Data fetched!");
 
 		// Assign to AirQuality Class
 		Type listType = new TypeToken<ArrayList<AirQualityData>>() {
@@ -107,7 +109,7 @@ public class JsonParser {
 	 */
 	public void readWords(String w1, String w2, String w3) {
 		// Get location from given words
-		conn.connToUrl(conn.getServer() + "/words/" + w1 + "/" + w2 + "/" + w3
+		this.conn.connToUrl(conn.getServer() + "/words/" + w1 + "/" + w2 + "/" + w3
 				+ "/details.json");
 
 		// Assign to Details class

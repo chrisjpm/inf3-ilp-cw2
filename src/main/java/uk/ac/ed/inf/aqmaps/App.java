@@ -93,7 +93,7 @@ public class App {
 
 		// Start flight path (1 move costs 1 battery power)
 		var moves = 0;
-		System.out.println("FLIGHT BEGINING...");
+		System.out.println("> FLIGHT BEGINING...");
 		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 			// Move drone 1 time
 			drone.nextMove();

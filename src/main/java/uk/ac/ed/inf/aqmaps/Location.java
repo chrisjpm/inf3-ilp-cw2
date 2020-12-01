@@ -69,7 +69,6 @@ public class Location {
 		// bearing
 		var lastValidBearing = this.bearing;
 		this.bearing = bearing(prevPos, targetPos);
-		System.out.println("Bearing: " + this.bearing);
 		var move = false;
 		var incrementBearing = true;
 		Point nextPos = null;
@@ -82,6 +81,7 @@ public class Location {
 				move = true;
 				lastValidBearing = this.bearing;
 			} else {
+				System.out.println("Readjusting bearing...");
 				// To recalculate the bearing, alternate +10 and -10 degrees
 				// from the last valid bearing.
 				if (incrementBearing) {
@@ -91,10 +91,10 @@ public class Location {
 					this.bearing = validBearing(this.bearing);
 
 					// If the drone is about to go back on it self, make a
-					// significant change to the bearing in opposite direction
+					// significant change to the bearing
 					if (lastValidBearing - this.bearing == 180
 							|| lastValidBearing + this.bearing == 180) {
-						this.bearing -= 40;
+						this.bearing += 20;
 						this.bearing = validBearing(this.bearing);
 						counter++;
 					}
@@ -105,7 +105,7 @@ public class Location {
 
 					if (lastValidBearing - this.bearing == 180
 							|| lastValidBearing + this.bearing == 180) {
-						this.bearing += 40;
+						this.bearing -= 20;
 						this.bearing = validBearing(this.bearing);
 						counter++;
 					}
@@ -199,9 +199,7 @@ public class Location {
 
 			if (linePath.intersectsLine(barrier)) {
 				System.out.println(
-						"Illegal move! Attempted to fly out of confinemeant area: ("
-								+ nextPos.latitude() + ", "
-								+ nextPos.longitude() + ")");
+						"Illegal move! Attempted to fly out of confinemeant area.");
 				crossConfinements = true;
 				break;
 			}
@@ -226,8 +224,7 @@ public class Location {
 				if (linePath.intersectsLine(barrier)) {
 					System.out.println(
 							"Illegal move! Attempted to fly through building '"
-									+ buildings[i] + "': (" + nextPos.latitude()
-									+ ", " + nextPos.longitude() + ")");
+									+ buildings[i] + "'");
 					crossNoFlyZone = true;
 					break;
 				}
@@ -238,10 +235,6 @@ public class Location {
 		}
 
 		var validMove = !crossConfinements && !crossNoFlyZone;
-
-		if (validMove)
-			System.out.println("Valid move! (" + nextPos.latitude() + ", "
-					+ nextPos.longitude() + ")");
 
 		return validMove;
 	}

@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.mapbox.geojson.Point;
@@ -96,7 +97,7 @@ public class Drone {
 
 		// Attempt to collect readings if there are still ones unvisited
 		if (targetSensor.sensorInRange(this.droneLoc)
-				&& this.targetSensorCounter <= 32) {
+				&& this.targetSensorCounter <= Map.SENSORS - 1) {
 			targetSensor.collectReadings(this.map, targetIdx);
 			this.sensorsReadWords
 					.add(this.map.getSensorsWords().get(targetIdx));
@@ -136,7 +137,7 @@ public class Drone {
 			sensorsCopy.remove(sensorsCopy.indexOf(nextSensor));
 		}
 
-		System.out.println("[Route of sensors to visit: " + route + "]\n");
+		System.out.println("[Route of sensors to visit: " + Arrays.toString(this.route) + "]\n");
 
 		return this.route;
 	}

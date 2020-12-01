@@ -139,6 +139,7 @@ public class Map {
 			sensorFt.addStringProperty("marker-symbol", "");
 			this.sensorsFts.add(sensorFt);
 		}
+		System.out.println("What3Words Data fetched!");
 
 		// Get pollution data from all sensors
 		var pollution = new PollutionLookUp();
@@ -165,8 +166,8 @@ public class Map {
 		for (int i = 0; i < dronePoints.size() - 1; i++) {
 			lines[i] = (i + 1) + "," + dronePoints.get(i).latitude() + ","
 					+ dronePoints.get(i).longitude() + "," + bearings.get(i)
-					+ "," + dronePoints.get(i + 1).latitude() + ","
-					+ dronePoints.get(i + 1).longitude() + "," + words.get(i);
+					+ "," + dronePoints.get(i + 1).longitude() + ","
+					+ dronePoints.get(i + 1).latitude() + "," + words.get(i);
 		}
 
 		return lines;

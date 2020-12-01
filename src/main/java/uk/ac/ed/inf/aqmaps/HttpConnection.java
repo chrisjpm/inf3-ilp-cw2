@@ -70,13 +70,9 @@ public class HttpConnection {
 
 		try {
 			var response = CLIENT.send(request, BodyHandlers.ofString());
-			System.out.println("Valid URI!");
-			System.out.println("Attempting to reach: " + urlString);
 
-			// Print out response code
+			// Get page content if connected OKAY
 			if (response.statusCode() == 200) {
-				System.out.println("Success! [Response code: "
-						+ response.statusCode() + "]");
 				this.json = response.body();
 			} else {
 				System.out.println(
