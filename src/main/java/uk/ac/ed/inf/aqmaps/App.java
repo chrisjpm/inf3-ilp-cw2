@@ -31,7 +31,7 @@ public class App {
 			String mm, String dd) {
 		// Write the flight path file
 		try {
-			FileWriter myWriter = new FileWriter("ilp-results/flightpath-" + dd
+			FileWriter myWriter = new FileWriter("flightpath-" + dd
 					+ "-" + mm + "-" + yyyy + ".txt");
 			for (int i = 0; i < flightpath.length - 1; i++) {
 				myWriter.write(flightpath[i] + "\n");
@@ -45,7 +45,7 @@ public class App {
 
 		// Write the readings file
 		try {
-			FileWriter myWriter = new FileWriter("ilp-results/readings-" + dd
+			FileWriter myWriter = new FileWriter("readings-" + dd
 					+ "-" + mm + "-" + yyyy + ".geojson");
 			myWriter.write(readings);
 			myWriter.close();
