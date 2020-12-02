@@ -97,7 +97,7 @@ public class App {
 		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 			// Move drone 1 time
 			drone.nextMove();
-			moves = i + 1;
+			moves = i;
 
 			// If we reach within 0.0003 of our starting position before 150
 			// moves then end the flight

@@ -1,8 +1,5 @@
 package uk.ac.ed.inf.aqmaps;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Class to assign colours and markers to air quality
  * 
@@ -12,84 +9,82 @@ import java.util.List;
 
 public class PollutionLookUp {
 	// Private variables
-	private List<String> markerColour;
-	private List<String> markerSymbol;
+	private String markerColour, markerSymbol;
 
 	/**
 	 * PollutionLookUp constructor
 	 */
 	public PollutionLookUp() {
-		this.markerColour = new ArrayList<String>();
-		this.markerSymbol = new ArrayList<String>();
+		this.markerColour = null;
+		this.markerSymbol = null;
 	}
 
 	// Getters
-	public List<String> getMarkerColours() {
+	public String getMarkerColour() {
 		return markerColour;
 	}
 
-	public List<String> getMarkerSymbols() {
+	public String getMarkerSymbol() {
 		return markerSymbol;
 	}
 
 	// Methods
 	/**
-	 * Assign colours and markers to air quality
+	 * Assign colour and symbol to marker
 	 * 
-	 * @param batteries - The battery values for all the sensors
-	 * @param readings  - The air quality reading for each sensor
+	 * @param batteries - The battery values for the sensor
+	 * @param reading   - The air quality reading for the sensor
 	 */
-	public void lookUp(List<Double> batteries, List<String> readings) {
+	public void lookUp(double battery, String reading) {
 		for (var i = 0; i < Map.SENSORS; i++) {
 			// If there was no reading taken, assign the colour black and a
-			// cross and continue to next list item
-			if (readings.get(i) == "null" || readings.get(i) == "NaN") {
-				this.markerColour.add("#000000");
-				this.markerSymbol.add("cross");
+			// cross
+			if (reading == "null" || reading == "NaN") {
+				this.markerColour = "#000000";
+				this.markerSymbol = "cross";
 				continue;
 			}
 
-			// If the battery was below 10%, assign black and a cross and
-			// continue to next list item
-			if (batteries.get(i) < 10) {
-				this.markerColour.add("#000000");
-				this.markerSymbol.add("cross");
+			// If the battery was below 10%, assign black and a cross
+			if (battery < 10) {
+				this.markerColour = "#000000";
+				this.markerSymbol = "cross";
 				continue;
 			}
 
-			// Take the valid reading and assign its colour and symbol 
-			if (Double.parseDouble(readings.get(i)) >= 0
-					&& Double.parseDouble(readings.get(i)) < 32) {
-				this.markerColour.add("#00ff00");
-				this.markerSymbol.add("lighthouse");
-			} else if (Double.parseDouble(readings.get(i)) >= 32
-					&& Double.parseDouble(readings.get(i)) < 64) {
-				this.markerColour.add("#40ff00");
-				this.markerSymbol.add("lighthouse");
-			} else if (Double.parseDouble(readings.get(i)) >= 64
-					&& Double.parseDouble(readings.get(i)) < 96) {
-				this.markerColour.add("#80ff00");
-				this.markerSymbol.add("lighthouse");
-			} else if (Double.parseDouble(readings.get(i)) >= 96
-					&& Double.parseDouble(readings.get(i)) < 128) {
-				this.markerColour.add("#c0ff00");
-				this.markerSymbol.add("lighthouse");
-			} else if (Double.parseDouble(readings.get(i)) >= 128
-					&& Double.parseDouble(readings.get(i)) < 160) {
-				this.markerColour.add("#ffc000");
-				this.markerSymbol.add("danger");
-			} else if (Double.parseDouble(readings.get(i)) >= 160
-					&& Double.parseDouble(readings.get(i)) < 192) {
-				this.markerColour.add("#ff8000");
-				this.markerSymbol.add("danger");
-			} else if (Double.parseDouble(readings.get(i)) >= 192
-					&& Double.parseDouble(readings.get(i)) < 224) {
-				this.markerColour.add("#ff4000");
-				this.markerSymbol.add("danger");
-			} else if (Double.parseDouble(readings.get(i)) >= 224
-					&& Double.parseDouble(readings.get(i)) < 256) {
-				this.markerColour.add("#ff0000");
-				this.markerSymbol.add("danger");
+			// Take the valid reading and assign its colour and symbol
+			if (Double.parseDouble(reading) >= 0
+					&& Double.parseDouble(reading) < 32) {
+				this.markerColour = "#00ff00";
+				this.markerSymbol = "lighthouse";
+			} else if (Double.parseDouble(reading) >= 32
+					&& Double.parseDouble(reading) < 64) {
+				this.markerColour = "#40ff00";
+				this.markerSymbol = "lighthouse";
+			} else if (Double.parseDouble(reading) >= 64
+					&& Double.parseDouble(reading) < 96) {
+				this.markerColour = "#80ff00";
+				this.markerSymbol = "lighthouse";
+			} else if (Double.parseDouble(reading) >= 96
+					&& Double.parseDouble(reading) < 128) {
+				this.markerColour = "#c0ff00";
+				this.markerSymbol = "lighthouse";
+			} else if (Double.parseDouble(reading) >= 128
+					&& Double.parseDouble(reading) < 160) {
+				this.markerColour = "#ffc000";
+				this.markerSymbol = "danger";
+			} else if (Double.parseDouble(reading) >= 160
+					&& Double.parseDouble(reading) < 192) {
+				this.markerColour = "#ff8000";
+				this.markerSymbol = "danger";
+			} else if (Double.parseDouble(reading) >= 192
+					&& Double.parseDouble(reading) < 224) {
+				this.markerColour = ("#ff4000");
+				this.markerSymbol = ("danger");
+			} else if (Double.parseDouble(reading) >= 224
+					&& Double.parseDouble(reading) < 256) {
+				this.markerColour = ("#ff0000");
+				this.markerSymbol = ("danger");
 			}
 		}
 	}

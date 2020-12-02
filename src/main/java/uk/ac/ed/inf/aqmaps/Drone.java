@@ -50,7 +50,7 @@ public class Drone {
 		// Initialise drone with a flight route
 		this.visitedPoints.add(this.droneLoc.getPoint());
 		this.flightComplete = false;
-		getRoute();
+		this.getRoute();
 	}
 
 	// Getters
@@ -72,23 +72,24 @@ public class Drone {
 	 */
 	public void nextMove() {
 		// Choose a target for the drone
-		var targetIdx = 0;
+		var targetIdx = 0;	
 		Location targetLoc = null;
+		Sensor targetSensor = null;
 
 		// If the drone has visited all sensors, make its way back to the start
 		// Else, find the next closest sensor
 		if (this.targetSensorCounter == 33) {
-			if (endInRange(this.droneLoc)) {
+			if (this.endInRange(this.droneLoc)) {
 				this.flightComplete = true;
 				return;
 			}
 			targetLoc = this.endLoc;
 		} else {
 			targetIdx = this.route[this.targetSensorCounter];
-			targetLoc = this.map.getSensorsLocs().get(targetIdx);
+			targetSensor = this.map.getSensors().get(targetIdx);
+			targetLoc = targetSensor.getSensorLoc();
 		}
-		var targetSensor = new Sensor(targetLoc);
-
+		
 		// Move drone and update its current Location
 		var destination = this.droneLoc.moveDrone(this.map, this.droneLoc,
 				targetLoc);
@@ -96,11 +97,9 @@ public class Drone {
 		this.droneLoc.setLng(destination.longitude());
 
 		// Attempt to collect readings if there are still ones unvisited
-		if (targetSensor.sensorInRange(this.droneLoc)
-				&& this.targetSensorCounter <= Map.SENSORS - 1) {
+		if (targetSensor != null && targetSensor.sensorInRange(this.droneLoc)) {
 			targetSensor.collectReadings(this.map, targetIdx);
-			this.sensorsReadWords
-					.add(this.map.getSensorsWords().get(targetIdx));
+			this.sensorsReadWords.add(targetSensor.getWhat3Words());
 			this.targetSensorCounter++;
 		} else {
 			this.sensorsReadWords.add(null);
@@ -117,27 +116,32 @@ public class Drone {
 	 */
 	public int[] getRoute() {
 		// Make two local copies of the sensors so we don't modify the original
-		var sensors = new ArrayList<Point>(); // Original indexing of sensors
-		var sensorsCopy = new ArrayList<Point>(); // Unvisited sensors
-		sensors.addAll(this.map.getSensorsPoints());
-		sensorsCopy.addAll(this.map.getSensorsPoints());
+		var sensorsCopy2 = this.map.getSensors();
+		var sensorsPoints = new ArrayList<Point>();
+		var sensorsPointsCopy = new ArrayList<Point>();
+		for (int i = 0; i < sensorsCopy2.size(); i++) {
+			sensorsPoints.add(sensorsCopy2.get(i).getSensorLoc().getPoint());
+			sensorsPointsCopy
+					.add(sensorsCopy2.get(i).getSensorLoc().getPoint());
+		}
 
 		// Find closest sensor and remove it from the list of ones unvisited and
 		// add it to the route
 		var nextSensor = TurfClassification
-				.nearestPoint(this.droneLoc.getPoint(), sensorsCopy);
-		this.route[0] = sensors.indexOf(nextSensor);
-		sensorsCopy.remove(sensorsCopy.indexOf(nextSensor));
+				.nearestPoint(this.droneLoc.getPoint(), sensorsPointsCopy);
+		this.route[0] = sensorsPoints.indexOf(nextSensor);
+		sensorsPointsCopy.remove(sensorsPointsCopy.indexOf(nextSensor));
 
 		// Find the rest of the route
 		for (int i = 1; i < Map.SENSORS; i++) {
 			nextSensor = TurfClassification.nearestPoint(nextSensor,
-					sensorsCopy);
-			this.route[i] = sensors.indexOf(nextSensor);
-			sensorsCopy.remove(sensorsCopy.indexOf(nextSensor));
+					sensorsPointsCopy);
+			this.route[i] = sensorsPoints.indexOf(nextSensor);
+			sensorsPointsCopy.remove(sensorsPointsCopy.indexOf(nextSensor));
 		}
 
-		System.out.println("[Route of sensors to visit: " + Arrays.toString(this.route) + "]\n");
+		System.out.println("[Route of sensors to visit: "
+				+ Arrays.toString(this.route) + "]\n");
 
 		return this.route;
 	}

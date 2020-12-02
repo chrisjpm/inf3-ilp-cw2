@@ -88,25 +88,25 @@ public class Location {
 					this.bearing += 10 * counter;
 
 					// Ensure valid bearing
-					this.bearing = validBearing(this.bearing);
+					this.bearing = this.validBearing(this.bearing);
 
 					// If the drone is about to go back on it self, adjust
 					// bearing again but in the opposite direction
 					if (lastValidBearing - this.bearing == 180
 							|| this.bearing - lastValidBearing == 180) {
 						this.bearing -= 20;
-						this.bearing = validBearing(this.bearing);
+						this.bearing = this.validBearing(this.bearing);
 						counter++;
 					}
 					incrementBearing = false;
 				} else {
 					this.bearing -= 10 * counter;
-					this.bearing = validBearing(this.bearing);
+					this.bearing = this.validBearing(this.bearing);
 
 					if (lastValidBearing - this.bearing == 180
 							|| this.bearing - lastValidBearing == 180) {
 						this.bearing += 20;
-						this.bearing = validBearing(this.bearing);
+						this.bearing = this.validBearing(this.bearing);
 						counter++;
 					}
 					incrementBearing = true;

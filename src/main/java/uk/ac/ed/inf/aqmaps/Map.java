@@ -28,10 +28,8 @@ public class Map {
 	private List<Point> confPoints;
 	private List<Geometry> noFlyZones;
 	private List<String> sensorsWords;
-	private List<Location> sensorsLocs;
-	private List<Point> sensorsPoints;
 	private List<Feature> sensorsFts;
-	private List<String> markerColours, markerSymbols;
+	private List<Sensor> sensors;
 
 	/**
 	 * Map constructor
@@ -44,9 +42,8 @@ public class Map {
 	public Map(JsonParser parser, String yyyy, String mm, String dd) {
 		this.confPoints = new ArrayList<Point>();
 		this.noFlyZones = new ArrayList<Geometry>();
-		this.sensorsLocs = new ArrayList<Location>();
-		this.sensorsPoints = new ArrayList<Point>();
 		this.sensorsFts = new ArrayList<Feature>();
+		this.sensors = new ArrayList<Sensor>();
 
 		// Create map on object creation
 		setUpMap(parser, yyyy, mm, dd);
@@ -61,28 +58,12 @@ public class Map {
 		return this.noFlyZones;
 	}
 
-	public List<String> getSensorsWords() {
-		return this.sensorsWords;
-	}
-
-	public List<Location> getSensorsLocs() {
-		return this.sensorsLocs;
-	}
-
-	public List<Point> getSensorsPoints() {
-		return this.sensorsPoints;
-	}
-
-	public List<String> getMarkerColours() {
-		return this.markerColours;
-	}
-
-	public List<String> getMarkerSymbols() {
-		return this.markerSymbols;
-	}
-
 	public List<Feature> getSensorsFts() {
 		return this.sensorsFts;
+	}
+	
+	public List<Sensor> getSensors() {
+		return this.sensors;
 	}
 
 	// Methods
@@ -112,41 +93,36 @@ public class Map {
 
 		// Parse sensors
 		parser.readMaps(yyyy, mm, dd);
-		var sensorsBattery = parser.getSensorBatteries();
-		var sensorsReading = parser.getSensorReadings();
 		this.sensorsWords = parser.getSensorWords();
-
+		System.out.println("What3Words Data fetched!");	
+		
 		for (int i = 0; i < SENSORS; i++) {
+			var battery = parser.getSensorBatteries().get(i);
+			var reading = parser.getSensorReadings().get(i);
+			
+			// Default sensor properties for unvisited
+			var symbol = "";;
+			var colour = "#aaaaaa";
+			
 			// Split the 3 words up and find their coordinates and points
-			var line = sensorsWords.get(i).split("\\.");
-			parser.readWords(line[0], line[1], line[2]);
+			var w3w = this.sensorsWords.get(i);
+			var words = w3w.split("\\.");
+			parser.readWords(words[0], words[1], words[2]);
 
 			var sensorLoc = new Location(parser.getWordsLat(),
 					parser.getWordsLng());
-			this.sensorsLocs.add(sensorLoc);
-			var sensorPoint = Point.fromLngLat(parser.getWordsLng(),
-					parser.getWordsLat());
-			this.sensorsPoints.add(Point.fromLngLat(parser.getWordsLng(),
-					parser.getWordsLat()));
+			
+			// Make new sensor
+			var sensor = new Sensor(sensorLoc, w3w, battery, reading, symbol, colour);
+			this.sensors.add(sensor);
 
 			// Convert sensors to features and add to a list
-			var sensorGeo = (Geometry) sensorPoint;
+			var sensorGeo = (Geometry) sensor.getSensorLoc().getPoint();
 			var sensorFt = Feature.fromGeometry(sensorGeo);
 
 			// Set up marker as not visited by default
-			sensorFt.addStringProperty("rgb-string", "#aaaaaa");
-			sensorFt.addStringProperty("fill", "#aaaaaa");
-			sensorFt.addStringProperty("marker-symbol", "");
-			this.sensorsFts.add(sensorFt);
+			this.sensorsFts.add(sensorFt);	
 		}
-		System.out.println("What3Words Data fetched!");
-
-		// Get pollution data from all sensors
-		var pollution = new PollutionLookUp();
-		pollution.lookUp(sensorsBattery, sensorsReading);
-		this.markerColours = pollution.getMarkerColours();
-		this.markerSymbols = pollution.getMarkerSymbols();
-
 	}
 
 	/**
