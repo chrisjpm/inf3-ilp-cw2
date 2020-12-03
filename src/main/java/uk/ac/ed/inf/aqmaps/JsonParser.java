@@ -71,7 +71,7 @@ public class JsonParser {
 		this.conn.connToUrl(conn.getServer() + "/buildings/no-fly-zones.geojson");
 		System.out.println("No-Fly Zones fetched!");
 
-		this.buildings = FeatureCollection.fromJson(conn.getJson()).features();
+		this.buildings = FeatureCollection.fromJson(this.conn.getJson()).features();
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class JsonParser {
 		// Assign to AirQuality Class
 		Type listType = new TypeToken<ArrayList<AirQualityData>>() {
 		}.getType();
-		ArrayList<AirQualityData> aqData = new Gson().fromJson(conn.getJson(),
+		ArrayList<AirQualityData> aqData = new Gson().fromJson(this.conn.getJson(),
 				listType);
 
 		for (int i = 0; i < aqData.size(); i++) {
@@ -113,7 +113,7 @@ public class JsonParser {
 				+ "/details.json");
 
 		// Assign to Details class
-		var sensorCoords = new Gson().fromJson(conn.getJson(), LocationDetails.class);
+		var sensorCoords = new Gson().fromJson(this.conn.getJson(), LocationDetails.class);
 
 		// Set coords of the sensors
 		this.wordsLng = sensorCoords.coordinates.lng;

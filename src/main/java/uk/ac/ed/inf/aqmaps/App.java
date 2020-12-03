@@ -27,12 +27,12 @@ public class App {
 	 * @param dd         - The day of the flight
 	 * @throws IOException If file cannot be written
 	 */
-	static void writeFiles(String[] flightpath, String readings, String yyyy,
+	private static void writeFiles(String[] flightpath, String readings, String yyyy,
 			String mm, String dd) {
 		// Write the flight path file
 		try {
-			FileWriter myWriter = new FileWriter("flightpath-" + dd
-					+ "-" + mm + "-" + yyyy + ".txt");
+			FileWriter myWriter = new FileWriter(
+					"flightpath-" + dd + "-" + mm + "-" + yyyy + ".txt");
 			for (int i = 0; i < flightpath.length - 1; i++) {
 				myWriter.write(flightpath[i] + "\n");
 			}
@@ -45,8 +45,8 @@ public class App {
 
 		// Write the readings file
 		try {
-			FileWriter myWriter = new FileWriter("readings-" + dd
-					+ "-" + mm + "-" + yyyy + ".geojson");
+			FileWriter myWriter = new FileWriter(
+					"readings-" + dd + "-" + mm + "-" + yyyy + ".geojson");
 			myWriter.write(readings);
 			myWriter.close();
 			System.out.println("Readings GeoJson successfully created!");
@@ -92,12 +92,10 @@ public class App {
 		var drone = new Drone(map, startPoint);
 
 		// Start flight path (1 move costs 1 battery power)
-		var moves = 0;
 		System.out.println("> FLIGHT BEGINING...");
 		for (int i = 0; i < Drone.BATTERY_POWER; i++) {
 			// Move drone 1 time
 			drone.nextMove();
-			moves = i;
 
 			// If we reach within 0.0003 of our starting position before 150
 			// moves then end the flight
@@ -105,16 +103,17 @@ public class App {
 				break;
 		}
 		System.out.println("> FLIGHT COMPLETE!\n");
-		System.out.println("[Flight ended in " + moves + " moves]\n");
+		System.out.println("[Flight ended in "
+				+ (drone.getVisitedPoints().size() - 1) + " moves]\n");
 
 		// Write our files containing the:
 		// 1. Flight Path - the series of moves taken by the drone
 		// 2. Readings - a visual representation of the data collected by the
 		// drone for GeoJSON
 		System.out.println("> WRITING FILES...");
-		var flightpath = map.getFlightPath(drone.getFlightPath(),
+		var flightpath = map.getFlightPath(drone.getVisitedPoints(),
 				drone.getBearings(), drone.getSensorsReadWords());
-		var readings = map.getReadings(drone.getFlightPath());
+		var readings = map.getReadings(drone.getVisitedPoints());
 		writeFiles(flightpath, readings, yyyy, mm, dd);
 		System.out.println("> WRITING COMPLETE!");
 	}

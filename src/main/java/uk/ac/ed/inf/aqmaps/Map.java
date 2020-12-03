@@ -27,7 +27,6 @@ public class Map {
 	private static final double LAT2 = 55.942617;
 	private List<Point> confPoints;
 	private List<Geometry> noFlyZones;
-	private List<String> sensorsWords;
 	private List<Feature> sensorsFts;
 	private List<Sensor> sensors;
 
@@ -93,7 +92,7 @@ public class Map {
 
 		// Parse sensors
 		parser.readMaps(yyyy, mm, dd);
-		this.sensorsWords = parser.getSensorWords();
+		var sensorsWords = parser.getSensorWords();
 		System.out.println("What3Words Data fetched!");	
 		
 		for (int i = 0; i < SENSORS; i++) {
@@ -101,11 +100,11 @@ public class Map {
 			var reading = parser.getSensorReadings().get(i);
 			
 			// Default sensor properties for unvisited
-			var symbol = "";;
+			var symbol = "";
 			var colour = "#aaaaaa";
 			
 			// Split the 3 words up and find their coordinates and points
-			var w3w = this.sensorsWords.get(i);
+			var w3w = sensorsWords.get(i);
 			var words = w3w.split("\\.");
 			parser.readWords(words[0], words[1], words[2]);
 

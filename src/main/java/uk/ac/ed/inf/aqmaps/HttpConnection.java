@@ -35,14 +35,6 @@ public class HttpConnection {
 	}
 
 	// Getters
-	public String getIp() {
-		return this.ip;
-	}
-
-	public String getPort() {
-		return this.port;
-	}
-
 	public String getServer() {
 		return "http://" + this.ip + ":" + this.port;
 	}
@@ -66,7 +58,6 @@ public class HttpConnection {
 		// Return the GeoJson content if response code is 200, i.e. a valid
 		// urlString. Else, return nothing.
 		// Try and connect to the URI, catch if it cannot.
-
 		try {
 			var response = CLIENT.send(request, BodyHandlers.ofString());
 

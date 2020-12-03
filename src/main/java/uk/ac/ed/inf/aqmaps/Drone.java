@@ -21,8 +21,8 @@ public class Drone {
 	public boolean flightComplete;
 
 	// Private variables
-	private Location droneLoc;
 	private final Location endLoc;
+	private Location droneLoc;
 	private Map map;
 	private List<Point> visitedPoints;
 	private int targetSensorCounter;
@@ -54,7 +54,7 @@ public class Drone {
 	}
 
 	// Getters
-	public List<Point> getFlightPath() {
+	public List<Point> getVisitedPoints() {
 		return this.visitedPoints;
 	}
 
@@ -91,8 +91,7 @@ public class Drone {
 		}
 		
 		// Move drone and update its current Location
-		var destination = this.droneLoc.moveDrone(this.map, this.droneLoc,
-				targetLoc);
+		var destination = this.droneLoc.moveDrone(this.map, targetLoc);
 		this.droneLoc.setLat(destination.latitude());
 		this.droneLoc.setLng(destination.longitude());
 
@@ -114,15 +113,16 @@ public class Drone {
 	 * 
 	 * @return The route of sensors the drone should visit
 	 */
-	public int[] getRoute() {
+	private int[] getRoute() {
 		// Make two local copies of the sensors so we don't modify the original
-		var sensorsCopy2 = this.map.getSensors();
+		var sensorsCopy = this.map.getSensors();
 		var sensorsPoints = new ArrayList<Point>();
 		var sensorsPointsCopy = new ArrayList<Point>();
-		for (int i = 0; i < sensorsCopy2.size(); i++) {
-			sensorsPoints.add(sensorsCopy2.get(i).getSensorLoc().getPoint());
+		
+		for (int i = 0; i < sensorsCopy.size(); i++) {
+			sensorsPoints.add(sensorsCopy.get(i).getSensorLoc().getPoint());
 			sensorsPointsCopy
-					.add(sensorsCopy2.get(i).getSensorLoc().getPoint());
+					.add(sensorsCopy.get(i).getSensorLoc().getPoint());
 		}
 
 		// Find closest sensor and remove it from the list of ones unvisited and
@@ -130,14 +130,14 @@ public class Drone {
 		var nextSensor = TurfClassification
 				.nearestPoint(this.droneLoc.getPoint(), sensorsPointsCopy);
 		this.route[0] = sensorsPoints.indexOf(nextSensor);
-		sensorsPointsCopy.remove(sensorsPointsCopy.indexOf(nextSensor));
+		sensorsPointsCopy.remove(nextSensor);
 
 		// Find the rest of the route
 		for (int i = 1; i < Map.SENSORS; i++) {
 			nextSensor = TurfClassification.nearestPoint(nextSensor,
 					sensorsPointsCopy);
 			this.route[i] = sensorsPoints.indexOf(nextSensor);
-			sensorsPointsCopy.remove(sensorsPointsCopy.indexOf(nextSensor));
+			sensorsPointsCopy.remove(nextSensor);
 		}
 
 		System.out.println("[Route of sensors to visit: "
@@ -154,7 +154,7 @@ public class Drone {
 	 * @return the truth value of whether it's in range of the end point (i.e.
 	 *         where it started).
 	 */
-	public boolean endInRange(Location droneLoc) {
+	private boolean endInRange(Location droneLoc) {
 		var dist = Math.sqrt(
 				Math.pow((this.endLoc.getLng() - droneLoc.getLng()), 2) + Math
 						.pow((this.endLoc.getLat() - droneLoc.getLat()), 2));

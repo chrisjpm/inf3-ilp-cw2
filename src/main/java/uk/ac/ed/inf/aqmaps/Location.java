@@ -64,11 +64,11 @@ public class Location {
 	 * @param targetPos - where the drone is aiming to go
 	 * @return The Point the drone will move to
 	 */
-	public Point moveDrone(Map map, Location prevPos, Location targetPos) {
+	public Point moveDrone(Map map, Location targetPos) {
 		// Keep track of bearing of last valid move and find a new target
 		// bearing
 		var lastValidBearing = this.bearing;
-		this.bearing = bearing(prevPos, targetPos);
+		this.bearing = bearing(this, targetPos);
 		var move = false;
 		var incrementBearing = true;
 		Point nextPos = null;
@@ -76,8 +76,8 @@ public class Location {
 
 		// Recalculate the target bearing until it results in a valid move
 		do {
-			nextPos = destination(prevPos, this.bearing);
-			if (prevPos.validDroneMove(map, nextPos)) {
+			nextPos = destination(this, this.bearing);
+			if (this.validDroneMove(map, nextPos)) {
 				move = true;
 				lastValidBearing = this.bearing;
 			} else {
@@ -96,7 +96,6 @@ public class Location {
 							|| this.bearing - lastValidBearing == 180) {
 						this.bearing -= 20;
 						this.bearing = this.validBearing(this.bearing);
-						counter++;
 					}
 					incrementBearing = false;
 				} else {
@@ -107,7 +106,6 @@ public class Location {
 							|| this.bearing - lastValidBearing == 180) {
 						this.bearing += 20;
 						this.bearing = this.validBearing(this.bearing);
-						counter++;
 					}
 					incrementBearing = true;
 				}
@@ -125,7 +123,7 @@ public class Location {
 	 * @param targetPos - Target drone Location
 	 * @return The bearing to target Location
 	 */
-	public int bearing(Location prevPos, Location targetPos) {
+	private int bearing(Location prevPos, Location targetPos) {
 		// Find change in latitude and longitude between the two Locations
 		var deltaLat = targetPos.getLat() - prevPos.getLat();
 		var deltaLng = targetPos.getLng() - prevPos.getLng();
@@ -159,7 +157,7 @@ public class Location {
 	 * @param bearingToTarget - The target found to next Point
 	 * @return The Point the drone will move to
 	 */
-	public Point destination(Location prevPos, double bearingToTarget) {
+	private Point destination(Location prevPos, double bearingToTarget) {
 		// Rudimentary trig to calculate new longitude and latitude
 		var nextPosLng = prevPos.getLng()
 				+ Drone.MOVE_DIST * Math.cos(Math.toRadians(bearingToTarget));
@@ -176,7 +174,7 @@ public class Location {
 	 * @param nextPos - The next proposed Point to move to
 	 * @return The truth value of the validity of the move
 	 */
-	public boolean validDroneMove(Map map, Point nextPos) {
+	private boolean validDroneMove(Map map, Point nextPos) {
 		// Proposed move
 		var linePath = new Line2D.Double(this.lat, this.lng, nextPos.latitude(),
 				nextPos.longitude());
@@ -246,7 +244,7 @@ public class Location {
 	 * @param bearing - The bearing we are working with
 	 * @return An equivalent bearing within the range 0 <= bearing < 360 degrees
 	 */
-	public int validBearing(int bearing) {
+	private int validBearing(int bearing) {
 		if (bearing < 0)
 			bearing += 360;
 		if (bearing >= 360)
