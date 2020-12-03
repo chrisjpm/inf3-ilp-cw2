@@ -26,7 +26,7 @@ public class HttpConnection {
 	/**
 	 * HttpConnection constructor
 	 * 
-	 * @param ip   - Server IP: {@code https://localhost/}
+	 * @param ip   - Server IP: {@code localhost}
 	 * @param port - User given port
 	 */
 	public HttpConnection(String ip, String port) {

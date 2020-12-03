@@ -157,7 +157,7 @@ public class Location {
 	 * @param bearingToTarget - The target found to next Point
 	 * @return The Point the drone will move to
 	 */
-	private Point destination(Location prevPos, double bearingToTarget) {
+	private Point destination(Location prevPos, int bearingToTarget) {
 		// Rudimentary trig to calculate new longitude and latitude
 		var nextPosLng = prevPos.getLng()
 				+ Drone.MOVE_DIST * Math.cos(Math.toRadians(bearingToTarget));

@@ -19,20 +19,19 @@ public class Sensor {
 	 * 
 	 * @param sensorLoc - Location of the target sensor
 	 * @param w3w       - the what3words location of the sensor
-	 * @param symbol    - marker symbol for GeoJSON
-	 * @param colour    - marker colour for GeoJSON
+	 * @param battery   - the battery charge of the sensor
+	 * @param reading   - the air-quality reading
 	 */
 	public Sensor(Location sensorLoc, String w3w, double battery,
-			String reading, String symbol, String colour) {
+			String reading) {
 		this.sensorLoc = sensorLoc;
 		this.w3w = w3w;
 		this.battery = battery;
 		this.reading = reading;
-		
-		var pollution = new PollutionLookUp();
-		pollution.lookUp(this.battery, this.reading);
-		this.symbol = pollution.getMarkerSymbol();
-		this.colour = pollution.getMarkerColour();
+
+		// Default marker properties
+		this.colour = "#aaaaaa";
+		this.symbol = "";
 	}
 
 	// Getters
@@ -52,13 +51,11 @@ public class Sensor {
 	 *         Sensor
 	 */
 	public boolean sensorInRange(Location droneLoc) {
-		var dronePoint = droneLoc.getPoint();
-		var sensorPoint = this.sensorLoc.getPoint();
-		var dist = Math.sqrt(Math
-				.pow((sensorPoint.longitude() - dronePoint.longitude()), 2)
-				+ Math.pow((sensorPoint.latitude() - dronePoint.latitude()),
-						2));
-		var inRange = dist <= READ_SENSOR_RANGE;
+		var sensorPoint = this.sensorLoc;
+		var dist = Math.sqrt(
+				Math.pow((sensorPoint.getLng() - droneLoc.getLng()), 2) + Math
+						.pow((sensorPoint.getLat() - droneLoc.getLat()), 2));
+		var inRange = dist < READ_SENSOR_RANGE;
 
 		return inRange;
 	}
@@ -71,7 +68,13 @@ public class Sensor {
 	 */
 	public void collectReadings(Map map, int targetIdx) {
 		// Take sensor's data and look up what colour and marker to assign
+		var pollution = new PollutionLookUp();
+		pollution.lookUp(this.battery, this.reading);
+		this.symbol = pollution.getMarkerSymbol();
+		this.colour = pollution.getMarkerColour();
+
 		var sensorFt = map.getSensorsFts().get(targetIdx);
+		sensorFt.addStringProperty("location", this.w3w);
 		sensorFt.addStringProperty("rgb-string", this.colour);
 		sensorFt.addStringProperty("marker-color", this.colour);
 		sensorFt.addStringProperty("marker-symbol", this.symbol);

@@ -92,19 +92,14 @@ public class Map {
 
 		// Parse sensors
 		parser.readMaps(yyyy, mm, dd);
-		var sensorsWords = parser.getSensorWords();
 		System.out.println("What3Words Data fetched!");	
 		
 		for (int i = 0; i < SENSORS; i++) {
 			var battery = parser.getSensorBatteries().get(i);
 			var reading = parser.getSensorReadings().get(i);
+			var w3w = parser.getSensorWords().get(i);
 			
-			// Default sensor properties for unvisited
-			var symbol = "";
-			var colour = "#aaaaaa";
-			
-			// Split the 3 words up and find their coordinates and points
-			var w3w = sensorsWords.get(i);
+			// Split the 3 words up and find their coordinates and points		
 			var words = w3w.split("\\.");
 			parser.readWords(words[0], words[1], words[2]);
 
@@ -112,7 +107,7 @@ public class Map {
 					parser.getWordsLng());
 			
 			// Make new sensor
-			var sensor = new Sensor(sensorLoc, w3w, battery, reading, symbol, colour);
+			var sensor = new Sensor(sensorLoc, w3w, battery, reading);
 			this.sensors.add(sensor);
 
 			// Convert sensors to features and add to a list

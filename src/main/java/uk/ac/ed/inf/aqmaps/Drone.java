@@ -78,7 +78,7 @@ public class Drone {
 
 		// If the drone has visited all sensors, make its way back to the start
 		// Else, find the next closest sensor
-		if (this.targetSensorCounter == 33) {
+		if (this.targetSensorCounter == Map.SENSORS) {
 			if (this.endInRange(this.droneLoc)) {
 				this.flightComplete = true;
 				return;
@@ -158,7 +158,7 @@ public class Drone {
 		var dist = Math.sqrt(
 				Math.pow((this.endLoc.getLng() - droneLoc.getLng()), 2) + Math
 						.pow((this.endLoc.getLat() - droneLoc.getLat()), 2));
-		var inRange = dist <= MOVE_DIST;
+		var inRange = dist < MOVE_DIST;
 
 		return inRange;
 	}
