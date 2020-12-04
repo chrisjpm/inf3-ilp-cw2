@@ -29,9 +29,10 @@ public class Sensor {
 		this.battery = battery;
 		this.reading = reading;
 
-		// Default marker properties
-		this.colour = "#aaaaaa";
-		this.symbol = "";
+		var pollution = new PollutionLookUp();
+		pollution.lookUp(this.battery, this.reading);
+		this.symbol = pollution.getMarkerSymbol();
+		this.colour = pollution.getMarkerColour();
 	}
 
 	// Getters
@@ -68,13 +69,7 @@ public class Sensor {
 	 */
 	public void collectReadings(Map map, int targetIdx) {
 		// Take sensor's data and look up what colour and marker to assign
-		var pollution = new PollutionLookUp();
-		pollution.lookUp(this.battery, this.reading);
-		this.symbol = pollution.getMarkerSymbol();
-		this.colour = pollution.getMarkerColour();
-
 		var sensorFt = map.getSensorsFts().get(targetIdx);
-		sensorFt.addStringProperty("location", this.w3w);
 		sensorFt.addStringProperty("rgb-string", this.colour);
 		sensorFt.addStringProperty("marker-color", this.colour);
 		sensorFt.addStringProperty("marker-symbol", this.symbol);

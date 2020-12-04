@@ -27,6 +27,9 @@ public class Location {
 	public Location(double lat, double lng) {
 		this.lat = lat;
 		this.lng = lng;
+		
+		// Initial bearing of 0 for first move so lastValidBearing!=null
+		this.bearing = 0;
 	}
 
 	// Getters
@@ -94,7 +97,7 @@ public class Location {
 					// bearing again but in the opposite direction
 					if (lastValidBearing - this.bearing == 180
 							|| this.bearing - lastValidBearing == 180) {
-						this.bearing -= 20;
+						this.bearing -= 10;
 						this.bearing = this.validBearing(this.bearing);
 					}
 					incrementBearing = false;
@@ -104,7 +107,7 @@ public class Location {
 
 					if (lastValidBearing - this.bearing == 180
 							|| this.bearing - lastValidBearing == 180) {
-						this.bearing += 20;
+						this.bearing += 10;
 						this.bearing = this.validBearing(this.bearing);
 					}
 					incrementBearing = true;

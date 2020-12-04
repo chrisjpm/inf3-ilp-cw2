@@ -25,6 +25,8 @@ public class Map {
 	private static final double LNG2 = -3.184319;
 	private static final double LAT1 = 55.946233;
 	private static final double LAT2 = 55.942617;
+	private static final String DEFAULT_COLOUR = "#aaaaaa";
+	private static final String DEFAULT_SYMBOL = "";
 	private List<Point> confPoints;
 	private List<Geometry> noFlyZones;
 	private List<Feature> sensorsFts;
@@ -113,6 +115,10 @@ public class Map {
 			// Convert sensors to features and add to a list
 			var sensorGeo = (Geometry) sensor.getSensorLoc().getPoint();
 			var sensorFt = Feature.fromGeometry(sensorGeo);
+			sensorFt.addStringProperty("location", w3w);
+			sensorFt.addStringProperty("rgb-string", DEFAULT_COLOUR);
+			sensorFt.addStringProperty("marker-color", DEFAULT_COLOUR);
+			sensorFt.addStringProperty("marker-symbol", DEFAULT_SYMBOL);
 
 			// Set up marker as not visited by default
 			this.sensorsFts.add(sensorFt);	
