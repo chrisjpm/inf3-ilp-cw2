@@ -15,7 +15,7 @@ Your application may write any messages which it likes to the standard output st
 ## How To Run
 First, start up the web server by running `java -jar WebServerLite.jar` in the WebServer folder.
 
-Then, in the root folder, run `java -jar target/aqmaps-0.0.1-SNAPSHOT.jar 15 06 2021 55.9444 -3.1878 5678 80`, where the arguements are: day, month, year, latitude, longitude, seed and port *(Note: I have not inlcuded the seed in any calculations, but must still be entered)*. To view the path, upload the `readings-DD-MM-YYYY.geojson` file to [GeoJson](https://geojson.io). 
+Then, in the root folder, run `java -jar target/aqmaps-0.0.1-SNAPSHOT.jar 15 06 2021 55.9444 -3.1878 5678 80`, where the arguements are: day, month, year, latitude, longitude, seed and port *(Note: I have not inlcuded the seed in any calculations, but must still be entered)*. To view the path, upload the `readings-DD-MM-YYYY.geojson` file created in the target folder to [GeoJson](https://geojson.io). 
 
 The available dates are all days through years 2020 and 2021.
 
