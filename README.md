@@ -23,7 +23,13 @@ Valid starting locations are within the confinement area and outside of no-fly z
 
 Set up the web server on any port you like, just make sure you use that in the arguements of the app.
 
+## Fightpath and Sensor Readings 01/01/2020
+
+![image](https://user-images.githubusercontent.com/5190947/111063393-1d8ab800-84a6-11eb-9d07-5ed26fed181b.png)
+
+*(108 moves)*
+
 ---
 
 ### Final Grade
-*Released 12/03/21*
+*Released 15/03/21*
