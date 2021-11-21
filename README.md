@@ -34,4 +34,4 @@ Set up the web server on any port you like, just make sure you use that in the a
 ### Final Grade
 96% 🎉
 
-[Feedback](https://github.com/cpuved/inf3-ilp-cw2/blob/master/feedback.txt) | [Auto Report](https://github.com/cpuved/inf3-ilp-cw2/blob/master/auto-report.txt)
+[Feedback](https://github.com/chrisjpm/inf3-ilp-cw2/blob/master/feedback.txt) | [Auto Report](https://github.com/chrisjpm/inf3-ilp-cw2/blob/master/auto-report.txt)
